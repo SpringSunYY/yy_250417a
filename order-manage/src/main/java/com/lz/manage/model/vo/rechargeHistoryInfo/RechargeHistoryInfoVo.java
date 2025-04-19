@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Date;
 import java.math.BigDecimal;
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import com.lz.common.annotation.Excel;
@@ -27,6 +29,7 @@ public class RechargeHistoryInfoVo implements Serializable
 
     /** 用户 */
     @Excel(name = "用户")
+    private String userName;
     private Long userId;
 
     /** 充值价格 */
