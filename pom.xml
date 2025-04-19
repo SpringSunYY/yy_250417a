@@ -233,6 +233,11 @@
                 <artifactId>order-common</artifactId>
                 <version>${order.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.lz</groupId>
+                <artifactId>order-manage</artifactId>
+                <version>${order.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -244,6 +249,7 @@
         <module>order-quartz</module>
         <module>order-generator</module>
         <module>order-common</module>
+        <module>order-manage</module>
     </modules>
     <packaging>pom</packaging>
 

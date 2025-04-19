@@ -61,6 +61,11 @@
             <artifactId>order-generator</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.lz</groupId>
+            <artifactId>order-manage</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
