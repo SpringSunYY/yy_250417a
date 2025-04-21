@@ -27,44 +27,44 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="供应商" prop="userId">
-        <el-input
-          v-model="queryParams.userId"
-          placeholder="请输入供应商"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker
-          v-model="daterangeCreateTime"
-          style="width: 240px"
-          value-format="yyyy-MM-dd"
-          type="daterange"
-          range-separator="-"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-        ></el-date-picker>
-      </el-form-item>
-      <el-form-item label="更新人" prop="updateBy">
-        <el-input
-          v-model="queryParams.updateBy"
-          placeholder="请输入更新人"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="更新时间">
-        <el-date-picker
-          v-model="daterangeUpdateTime"
-          style="width: 240px"
-          value-format="yyyy-MM-dd"
-          type="daterange"
-          range-separator="-"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-        ></el-date-picker>
-      </el-form-item>
+      <!--      <el-form-item label="供应商" prop="userId">-->
+      <!--        <el-input-->
+      <!--          v-model="queryParams.userId"-->
+      <!--          placeholder="请输入供应商"-->
+      <!--          clearable-->
+      <!--          @keyup.enter.native="handleQuery"-->
+      <!--        />-->
+      <!--      </el-form-item>-->
+<!--      <el-form-item label="创建时间">-->
+<!--        <el-date-picker-->
+<!--          v-model="daterangeCreateTime"-->
+<!--          style="width: 240px"-->
+<!--          value-format="yyyy-MM-dd"-->
+<!--          type="daterange"-->
+<!--          range-separator="-"-->
+<!--          start-placeholder="开始日期"-->
+<!--          end-placeholder="结束日期"-->
+<!--        ></el-date-picker>-->
+<!--      </el-form-item>-->
+<!--      <el-form-item label="更新人" prop="updateBy">-->
+<!--        <el-input-->
+<!--          v-model="queryParams.updateBy"-->
+<!--          placeholder="请输入更新人"-->
+<!--          clearable-->
+<!--          @keyup.enter.native="handleQuery"-->
+<!--        />-->
+<!--      </el-form-item>-->
+<!--      <el-form-item label="更新时间">-->
+<!--        <el-date-picker-->
+<!--          v-model="daterangeUpdateTime"-->
+<!--          style="width: 240px"-->
+<!--          value-format="yyyy-MM-dd"-->
+<!--          type="daterange"-->
+<!--          range-separator="-"-->
+<!--          start-placeholder="开始日期"-->
+<!--          end-placeholder="结束日期"-->
+<!--        ></el-date-picker>-->
+<!--      </el-form-item>-->
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -80,7 +80,8 @@
           size="mini"
           @click="handleAdd"
           v-hasPermi="['manage:goodsInfo:add']"
-        >新增</el-button>
+        >新增
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -91,7 +92,8 @@
           :disabled="single"
           @click="handleUpdate"
           v-hasPermi="['manage:goodsInfo:edit']"
-        >修改</el-button>
+        >修改
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -102,7 +104,8 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['manage:goodsInfo:remove']"
-        >删除</el-button>
+        >删除
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -112,42 +115,57 @@
           size="mini"
           @click="handleExport"
           v-hasPermi="['manage:goodsInfo:export']"
-        >导出</el-button>
+        >导出
+        </el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" :columns="columns"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="goodsInfoList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="编号" align="center" v-if="columns[0].visible" prop="goodsId" />
-        <el-table-column label="商品名称" :show-overflow-tooltip="true" align="center" v-if="columns[1].visible" prop="goodsName" />
-        <el-table-column label="商品价格" :show-overflow-tooltip="true" align="center" v-if="columns[2].visible" prop="goodsPrice" />
-        <el-table-column label="商品描述" :show-overflow-tooltip="true" align="center" v-if="columns[3].visible" prop="goodsDesc" />
-        <el-table-column label="商品图片" align="center" v-if="columns[4].visible" prop="goodsImage" width="100">
+      <el-table-column type="selection" width="55" align="center"/>
+      <el-table-column label="编号" align="center" v-if="columns[0].visible" prop="goodsId"/>
+      <el-table-column label="商品名称" :show-overflow-tooltip="true" align="center" v-if="columns[1].visible"
+                       prop="goodsName"
+      />
+      <el-table-column label="商品价格" :show-overflow-tooltip="true" align="center" v-if="columns[2].visible"
+                       prop="goodsPrice"
+      />
+      <el-table-column label="商品描述" :show-overflow-tooltip="true" align="center" v-if="columns[3].visible"
+                       prop="goodsDesc"
+      />
+      <el-table-column label="商品图片" align="center" v-if="columns[4].visible" prop="goodsImage" width="100">
         <template slot-scope="scope">
           <image-preview :src="scope.row.goodsImage" :width="50" :height="50"/>
         </template>
       </el-table-column>
-        <el-table-column label="商品状态" align="center" v-if="columns[5].visible" prop="goodsStatus">
+      <el-table-column label="商品状态" align="center" v-if="columns[5].visible" prop="goodsStatus">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.goods_status" :value="scope.row.goodsStatus"/>
         </template>
       </el-table-column>
-        <el-table-column label="购买次数" :show-overflow-tooltip="true" align="center" v-if="columns[6].visible" prop="purchaseNum" />
-        <el-table-column label="供应商" :show-overflow-tooltip="true" align="center" v-if="columns[7].visible" prop="userId" />
-        <el-table-column label="创建时间" align="center" v-if="columns[8].visible" prop="createTime" width="180">
+      <el-table-column label="购买次数" :show-overflow-tooltip="true" align="center" v-if="columns[6].visible"
+                       prop="purchaseNum"
+      />
+      <el-table-column label="供应商" :show-overflow-tooltip="true" align="center" v-if="columns[7].visible"
+                       prop="userName"
+      />
+      <el-table-column label="创建时间" align="center" v-if="columns[8].visible" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-        <el-table-column label="更新人" :show-overflow-tooltip="true" align="center" v-if="columns[9].visible" prop="updateBy" />
-        <el-table-column label="更新时间" align="center" v-if="columns[10].visible" prop="updateTime" width="180">
+      <el-table-column label="更新人" :show-overflow-tooltip="true" align="center" v-if="columns[9].visible"
+                       prop="updateBy"
+      />
+      <el-table-column label="更新时间" align="center" v-if="columns[10].visible" prop="updateTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.updateTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-        <el-table-column label="备注" :show-overflow-tooltip="true" align="center" v-if="columns[11].visible" prop="remark" />
-        <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="备注" :show-overflow-tooltip="true" align="center" v-if="columns[11].visible"
+                       prop="remark"
+      />
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -155,14 +173,16 @@
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['manage:goodsInfo:edit']"
-          >修改</el-button>
+          >修改
+          </el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['manage:goodsInfo:remove']"
-          >删除</el-button>
+          >删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -179,34 +199,35 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="商品名称" prop="goodsName">
-          <el-input v-model="form.goodsName" placeholder="请输入商品名称" />
+          <el-input v-model="form.goodsName" placeholder="请输入商品名称"/>
         </el-form-item>
         <el-form-item label="商品价格" prop="goodsPrice">
-          <el-input v-model="form.goodsPrice" placeholder="请输入商品价格" />
+          <el-input-number :min="0" :precision="2" v-model="form.goodsPrice" placeholder="请输入商品价格"/>
         </el-form-item>
         <el-form-item label="商品描述" prop="goodsDesc">
-          <el-input v-model="form.goodsDesc" placeholder="请输入商品描述" />
+          <el-input v-model="form.goodsDesc" placeholder="请输入商品描述"/>
         </el-form-item>
         <el-form-item label="商品图片" prop="goodsImage">
           <image-upload v-model="form.goodsImage"/>
         </el-form-item>
-        <el-form-item label="商品状态" prop="goodsStatus">
+        <el-form-item label="商品状态" prop="goodsStatus" v-hasPermi="['manage:goodsInfo:audit']">
           <el-radio-group v-model="form.goodsStatus">
             <el-radio
               v-for="dict in dict.type.goods_status"
               :key="dict.value"
-              :label="parseInt(dict.value)"
-            >{{dict.label}}</el-radio>
+              :label="dict.value"
+            >{{ dict.label }}
+            </el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="购买次数" prop="purchaseNum">
-          <el-input v-model="form.purchaseNum" placeholder="请输入购买次数" />
-        </el-form-item>
-        <el-form-item label="供应商" prop="userId">
-          <el-input v-model="form.userId" placeholder="请输入供应商" />
-        </el-form-item>
+        <!--        <el-form-item label="购买次数" prop="purchaseNum">-->
+        <!--          <el-input v-model="form.purchaseNum" placeholder="请输入购买次数" />-->
+        <!--        </el-form-item>-->
+        <!--        <el-form-item label="供应商" prop="userId">-->
+        <!--          <el-input v-model="form.userId" placeholder="请输入供应商" />-->
+        <!--        </el-form-item>-->
         <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
+          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -218,28 +239,28 @@
 </template>
 
 <script>
-import { listGoodsInfo, getGoodsInfo, delGoodsInfo, addGoodsInfo, updateGoodsInfo } from "@/api/manage/goodsInfo";
+import { listGoodsInfo, getGoodsInfo, delGoodsInfo, addGoodsInfo, updateGoodsInfo } from '@/api/manage/goodsInfo'
 
 export default {
-  name: "GoodsInfo",
+  name: 'GoodsInfo',
   dicts: ['goods_status'],
   data() {
     return {
       //表格展示列
       columns: [
-        { key: 0, label: '编号', visible: true },
-          { key: 1, label: '商品名称', visible: true },
-          { key: 2, label: '商品价格', visible: true },
-          { key: 3, label: '商品描述', visible: true },
-          { key: 4, label: '商品图片', visible: true },
-          { key: 5, label: '商品状态', visible: true },
-          { key: 6, label: '购买次数', visible: true },
-          { key: 7, label: '供应商', visible: true },
-          { key: 8, label: '创建时间', visible: true },
-          { key: 9, label: '更新人', visible: true },
-          { key: 10, label: '更新时间', visible: true },
-          { key: 11, label: '备注', visible: true },
-        ],
+        { key: 0, label: '编号', visible: false },
+        { key: 1, label: '商品名称', visible: true },
+        { key: 2, label: '商品价格', visible: true },
+        { key: 3, label: '商品描述', visible: true },
+        { key: 4, label: '商品图片', visible: true },
+        { key: 5, label: '商品状态', visible: true },
+        { key: 6, label: '购买次数', visible: true },
+        { key: 7, label: '供应商', visible: true },
+        { key: 8, label: '创建时间', visible: true },
+        { key: 9, label: '更新人', visible: false },
+        { key: 10, label: '更新时间', visible: false },
+        { key: 11, label: '备注', visible: false }
+      ],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -255,7 +276,7 @@ export default {
       // 商品信息表格数据
       goodsInfoList: [],
       // 弹出层标题
-      title: "",
+      title: '',
       // 是否显示弹出层
       open: false,
       // 备注时间范围
@@ -272,59 +293,59 @@ export default {
         userId: null,
         createTime: null,
         updateBy: null,
-        updateTime: null,
+        updateTime: null
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
         goodsName: [
-          { required: true, message: "商品名称不能为空", trigger: "blur" }
+          { required: true, message: '商品名称不能为空', trigger: 'blur' }
         ],
         goodsPrice: [
-          { required: true, message: "商品价格不能为空", trigger: "blur" }
+          { required: true, message: '商品价格不能为空', trigger: 'blur' }
         ],
         goodsStatus: [
-          { required: true, message: "商品状态不能为空", trigger: "change" }
+          { required: true, message: '商品状态不能为空', trigger: 'change' }
         ],
         purchaseNum: [
-          { required: true, message: "购买次数不能为空", trigger: "blur" }
+          { required: true, message: '购买次数不能为空', trigger: 'blur' }
         ],
         userId: [
-          { required: true, message: "供应商不能为空", trigger: "blur" }
+          { required: true, message: '供应商不能为空', trigger: 'blur' }
         ],
         createTime: [
-          { required: true, message: "创建时间不能为空", trigger: "blur" }
-        ],
+          { required: true, message: '创建时间不能为空', trigger: 'blur' }
+        ]
       }
-    };
+    }
   },
   created() {
-    this.getList();
+    this.getList()
   },
   methods: {
     /** 查询商品信息列表 */
     getList() {
-      this.loading = true;
-      this.queryParams.params = {};
+      this.loading = true
+      this.queryParams.params = {}
       if (null != this.daterangeCreateTime && '' != this.daterangeCreateTime) {
-        this.queryParams.params["beginCreateTime"] = this.daterangeCreateTime[0];
-        this.queryParams.params["endCreateTime"] = this.daterangeCreateTime[1];
+        this.queryParams.params['beginCreateTime'] = this.daterangeCreateTime[0]
+        this.queryParams.params['endCreateTime'] = this.daterangeCreateTime[1]
       }
       if (null != this.daterangeUpdateTime && '' != this.daterangeUpdateTime) {
-        this.queryParams.params["beginUpdateTime"] = this.daterangeUpdateTime[0];
-        this.queryParams.params["endUpdateTime"] = this.daterangeUpdateTime[1];
+        this.queryParams.params['beginUpdateTime'] = this.daterangeUpdateTime[0]
+        this.queryParams.params['endUpdateTime'] = this.daterangeUpdateTime[1]
       }
       listGoodsInfo(this.queryParams).then(response => {
-        this.goodsInfoList = response.rows;
-        this.total = response.total;
-        this.loading = false;
-      });
+        this.goodsInfoList = response.rows
+        this.total = response.total
+        this.loading = false
+      })
     },
     // 取消按钮
     cancel() {
-      this.open = false;
-      this.reset();
+      this.open = false
+      this.reset()
     },
     // 表单重置
     reset() {
@@ -341,72 +362,73 @@ export default {
         updateBy: null,
         updateTime: null,
         remark: null
-      };
-      this.resetForm("form");
+      }
+      this.resetForm('form')
     },
     /** 搜索按钮操作 */
     handleQuery() {
-      this.queryParams.pageNum = 1;
-      this.getList();
+      this.queryParams.pageNum = 1
+      this.getList()
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.daterangeCreateTime = [];
-      this.daterangeUpdateTime = [];
-      this.resetForm("queryForm");
-      this.handleQuery();
+      this.daterangeCreateTime = []
+      this.daterangeUpdateTime = []
+      this.resetForm('queryForm')
+      this.handleQuery()
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.goodsId)
-      this.single = selection.length!==1
+      this.single = selection.length !== 1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
     handleAdd() {
-      this.reset();
-      this.open = true;
-      this.title = "添加商品信息";
+      this.reset()
+      this.open = true
+      this.title = '添加商品信息'
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
-      this.reset();
+      this.reset()
       const goodsId = row.goodsId || this.ids
       getGoodsInfo(goodsId).then(response => {
-        this.form = response.data;
-        this.open = true;
-        this.title = "修改商品信息";
-      });
+        this.form = response.data
+        this.open = true
+        this.title = '修改商品信息'
+      })
     },
     /** 提交按钮 */
     submitForm() {
-      this.$refs["form"].validate(valid => {
+      this.$refs['form'].validate(valid => {
         if (valid) {
           if (this.form.goodsId != null) {
             updateGoodsInfo(this.form).then(response => {
-              this.$modal.msgSuccess("修改成功");
-              this.open = false;
-              this.getList();
-            });
+              this.$modal.msgSuccess('修改成功')
+              this.open = false
+              this.getList()
+            })
           } else {
             addGoodsInfo(this.form).then(response => {
-              this.$modal.msgSuccess("新增成功");
-              this.open = false;
-              this.getList();
-            });
+              this.$modal.msgSuccess('新增成功')
+              this.open = false
+              this.getList()
+            })
           }
         }
-      });
+      })
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const goodsIds = row.goodsId || this.ids;
+      const goodsIds = row.goodsId || this.ids
       this.$modal.confirm('是否确认删除商品信息编号为"' + goodsIds + '"的数据项？').then(function() {
-        return delGoodsInfo(goodsIds);
+        return delGoodsInfo(goodsIds)
       }).then(() => {
-        this.getList();
-        this.$modal.msgSuccess("删除成功");
-      }).catch(() => {});
+        this.getList()
+        this.$modal.msgSuccess('删除成功')
+      }).catch(() => {
+      })
     },
     /** 导出按钮操作 */
     handleExport() {
@@ -415,5 +437,5 @@ export default {
       }, `goodsInfo_${new Date().getTime()}.xlsx`)
     }
   }
-};
+}
 </script>

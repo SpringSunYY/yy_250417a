@@ -51,6 +51,7 @@ public class GoodsInfoVo implements Serializable
 
     /** 供应商 */
     @Excel(name = "供应商")
+    private String userName;
     private Long userId;
 
     /** 创建时间 */

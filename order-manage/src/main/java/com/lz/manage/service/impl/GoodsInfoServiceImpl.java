@@ -5,12 +5,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.stream.Collectors;
+
+import com.lz.common.core.domain.entity.SysUser;
+import com.lz.common.utils.SecurityUtils;
 import com.lz.common.utils.StringUtils;
+
 import java.math.BigDecimal;
 import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.lz.common.utils.DateUtils;
+
 import javax.annotation.Resource;
+
+import com.lz.manage.model.enums.AuditCommonStatus;
+import com.lz.system.service.ISysUserService;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -22,93 +31,102 @@ import com.lz.manage.model.vo.goodsInfo.GoodsInfoVo;
 
 /**
  * 商品信息Service业务层处理
- * 
+ *
  * @author YY
  * @date 2025-04-19
  */
 @Service
-public class GoodsInfoServiceImpl extends ServiceImpl<GoodsInfoMapper, GoodsInfo> implements IGoodsInfoService
-{
+public class GoodsInfoServiceImpl extends ServiceImpl<GoodsInfoMapper, GoodsInfo> implements IGoodsInfoService {
     @Resource
     private GoodsInfoMapper goodsInfoMapper;
 
+    @Resource
+    private ISysUserService userService;
+
     //region mybatis代码
+
     /**
      * 查询商品信息
-     * 
+     *
      * @param goodsId 商品信息主键
      * @return 商品信息
      */
     @Override
-    public GoodsInfo selectGoodsInfoByGoodsId(Long goodsId)
-    {
+    public GoodsInfo selectGoodsInfoByGoodsId(Long goodsId) {
         return goodsInfoMapper.selectGoodsInfoByGoodsId(goodsId);
     }
 
     /**
      * 查询商品信息列表
-     * 
+     *
      * @param goodsInfo 商品信息
      * @return 商品信息
      */
     @Override
-    public List<GoodsInfo> selectGoodsInfoList(GoodsInfo goodsInfo)
-    {
-        return goodsInfoMapper.selectGoodsInfoList(goodsInfo);
+    public List<GoodsInfo> selectGoodsInfoList(GoodsInfo goodsInfo) {
+        List<GoodsInfo> goodsInfos = goodsInfoMapper.selectGoodsInfoList(goodsInfo);
+        for (GoodsInfo info : goodsInfos) {
+            SysUser user = userService.selectUserById(info.getUserId());
+            if (StringUtils.isNotNull(user)) {
+                info.setUserName(user.getUserName());
+            }
+        }
+        return goodsInfos;
     }
 
     /**
      * 新增商品信息
-     * 
+     *
      * @param goodsInfo 商品信息
      * @return 结果
      */
     @Override
-    public int insertGoodsInfo(GoodsInfo goodsInfo)
-    {
+    public int insertGoodsInfo(GoodsInfo goodsInfo) {
+        goodsInfo.setGoodsStatus(Long.parseLong(AuditCommonStatus.AUDIT_COMMON_STATUS_0.getValue()));
+        goodsInfo.setPurchaseNum(0L);
+        goodsInfo.setUserId(SecurityUtils.getUserId());
         goodsInfo.setCreateTime(DateUtils.getNowDate());
         return goodsInfoMapper.insertGoodsInfo(goodsInfo);
     }
 
     /**
      * 修改商品信息
-     * 
+     *
      * @param goodsInfo 商品信息
      * @return 结果
      */
     @Override
-    public int updateGoodsInfo(GoodsInfo goodsInfo)
-    {
+    public int updateGoodsInfo(GoodsInfo goodsInfo) {
+        goodsInfo.setUpdateBy(SecurityUtils.getUsername());
         goodsInfo.setUpdateTime(DateUtils.getNowDate());
         return goodsInfoMapper.updateGoodsInfo(goodsInfo);
     }
 
     /**
      * 批量删除商品信息
-     * 
+     *
      * @param goodsIds 需要删除的商品信息主键
      * @return 结果
      */
     @Override
-    public int deleteGoodsInfoByGoodsIds(Long[] goodsIds)
-    {
+    public int deleteGoodsInfoByGoodsIds(Long[] goodsIds) {
         return goodsInfoMapper.deleteGoodsInfoByGoodsIds(goodsIds);
     }
 
     /**
      * 删除商品信息信息
-     * 
+     *
      * @param goodsId 商品信息主键
      * @return 结果
      */
     @Override
-    public int deleteGoodsInfoByGoodsId(Long goodsId)
-    {
+    public int deleteGoodsInfoByGoodsId(Long goodsId) {
         return goodsInfoMapper.deleteGoodsInfoByGoodsId(goodsId);
     }
+
     //endregion
     @Override
-    public QueryWrapper<GoodsInfo> getQueryWrapper(GoodsInfoQuery goodsInfoQuery){
+    public QueryWrapper<GoodsInfo> getQueryWrapper(GoodsInfoQuery goodsInfoQuery) {
         QueryWrapper<GoodsInfo> queryWrapper = new QueryWrapper<>();
         //如果不使用params可以删除
         Map<String, Object> params = goodsInfoQuery.getParams();
@@ -116,25 +134,25 @@ public class GoodsInfoServiceImpl extends ServiceImpl<GoodsInfoMapper, GoodsInfo
             params = new HashMap<>();
         }
         Long goodsId = goodsInfoQuery.getGoodsId();
-        queryWrapper.eq( StringUtils.isNotNull(goodsId),"goods_id",goodsId);
+        queryWrapper.eq(StringUtils.isNotNull(goodsId), "goods_id", goodsId);
 
         String goodsName = goodsInfoQuery.getGoodsName();
-        queryWrapper.like(StringUtils.isNotEmpty(goodsName) ,"goods_name",goodsName);
+        queryWrapper.like(StringUtils.isNotEmpty(goodsName), "goods_name", goodsName);
 
         Long goodsStatus = goodsInfoQuery.getGoodsStatus();
-        queryWrapper.eq( StringUtils.isNotNull(goodsStatus),"goods_status",goodsStatus);
+        queryWrapper.eq(StringUtils.isNotNull(goodsStatus), "goods_status", goodsStatus);
 
         Long userId = goodsInfoQuery.getUserId();
-        queryWrapper.eq( StringUtils.isNotNull(userId),"user_id",userId);
+        queryWrapper.eq(StringUtils.isNotNull(userId), "user_id", userId);
 
         Date createTime = goodsInfoQuery.getCreateTime();
-        queryWrapper.between(StringUtils.isNotNull(params.get("beginCreateTime"))&&StringUtils.isNotNull(params.get("endCreateTime")),"create_time",params.get("beginCreateTime"),params.get("endCreateTime"));
+        queryWrapper.between(StringUtils.isNotNull(params.get("beginCreateTime")) && StringUtils.isNotNull(params.get("endCreateTime")), "create_time", params.get("beginCreateTime"), params.get("endCreateTime"));
 
         String updateBy = goodsInfoQuery.getUpdateBy();
-        queryWrapper.like(StringUtils.isNotEmpty(updateBy) ,"update_by",updateBy);
+        queryWrapper.like(StringUtils.isNotEmpty(updateBy), "update_by", updateBy);
 
         Date updateTime = goodsInfoQuery.getUpdateTime();
-        queryWrapper.between(StringUtils.isNotNull(params.get("beginUpdateTime"))&&StringUtils.isNotNull(params.get("endUpdateTime")),"update_time",params.get("beginUpdateTime"),params.get("endUpdateTime"));
+        queryWrapper.between(StringUtils.isNotNull(params.get("beginUpdateTime")) && StringUtils.isNotNull(params.get("endUpdateTime")), "update_time", params.get("beginUpdateTime"), params.get("endUpdateTime"));
 
         return queryWrapper;
     }
