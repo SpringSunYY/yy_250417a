@@ -19,15 +19,18 @@ import com.lz.common.utils.DateUtils;
 
 import javax.annotation.Resource;
 
-import com.lz.manage.model.domain.CollectInfo;
-import com.lz.manage.model.domain.GoodsInfo;
+import com.lz.manage.model.domain.*;
+import com.lz.manage.model.dto.goodsCardInfo.GoodsCardPay;
+import com.lz.manage.model.enums.AuditCommonStatus;
+import com.lz.manage.model.enums.OrderStatus;
 import com.lz.manage.service.IGoodsInfoService;
+import com.lz.manage.service.IOrderInfoService;
+import com.lz.manage.service.IUserAddressInfoService;
 import com.lz.system.service.ISysUserService;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.lz.manage.mapper.GoodsCardInfoMapper;
-import com.lz.manage.model.domain.GoodsCardInfo;
 import com.lz.manage.service.IGoodsCardInfoService;
 import com.lz.manage.model.dto.goodsCardInfo.GoodsCardInfoQuery;
 import com.lz.manage.model.vo.goodsCardInfo.GoodsCardInfoVo;
@@ -48,6 +51,12 @@ public class GoodsCardInfoServiceImpl extends ServiceImpl<GoodsCardInfoMapper, G
 
     @Resource
     private IGoodsInfoService goodsInfoService;
+
+    @Resource
+    private IOrderInfoService orderInfoService;
+
+    @Resource
+    private IUserAddressInfoService userAddressInfoService;
 
     //region mybatis代码
 
@@ -181,6 +190,48 @@ public class GoodsCardInfoServiceImpl extends ServiceImpl<GoodsCardInfoMapper, G
             return Collections.emptyList();
         }
         return goodsCardInfoList.stream().map(GoodsCardInfoVo::objToVo).collect(Collectors.toList());
+    }
+
+    @Override
+    public int payOrderCard(GoodsCardPay goodsCardPay) {
+        Long addressId = goodsCardPay.getAddressId();
+        UserAddressInfo userAddressInfo = userAddressInfoService.selectUserAddressInfoByAddressId(addressId);
+        if (StringUtils.isNull(userAddressInfo)) {
+            throw new ServiceException("收货地址不存在");
+        }
+        //批量购买商品
+        String[] cardIdArr = goodsCardPay.getCardIds().split(",");
+        ArrayList<OrderInfo> orderInfos = new ArrayList<>();
+        for (String cardId : cardIdArr) {
+            GoodsCardInfo cardInfo = this.getOne(new LambdaQueryWrapper<GoodsCardInfo>()
+                    .eq(GoodsCardInfo::getCardId, cardId));
+            if (StringUtils.isNull(cardInfo)) {
+                throw new ServiceException("购物车编号不存在--" + cardId);
+            }
+            if (!cardInfo.getUserId().toString().equals(SecurityUtils.getUserId().toString())) {
+                throw new ServiceException("该购物车不是自己的--" + cardId);
+            }
+            GoodsInfo goodsInfo = goodsInfoService.selectGoodsInfoByGoodsId(cardInfo.getGoodsId());
+            if (StringUtils.isNull(goodsInfo)) {
+                throw new ServiceException("商品不存在,购物车编号--" + cardId);
+            }
+            if (!goodsInfo.getGoodsStatus().toString().equals(AuditCommonStatus.AUDIT_COMMON_STATUS_1.getValue())) {
+                throw new ServiceException("商品状态异常,购物车编号--" + cardId);
+            }
+            OrderInfo orderInfo = new OrderInfo();
+            orderInfo.setGoodsId(goodsInfo.getGoodsId());
+            orderInfo.setUserId(cardInfo.getUserId());
+            orderInfo.setAddressId(addressId);
+            orderInfo.setTotalPrice(goodsInfo.getGoodsPrice());
+            orderInfo.setHistoryStatus(Long.valueOf(OrderStatus.ORDER_STATUS_0.getValue()));
+            orderInfo.setSupplierId(goodsInfo.getUserId());
+            orderInfo.setCreateTime(new Date());
+            orderInfos.add(orderInfo);
+        }
+        //创建订单列表
+        orderInfoService.saveBatch(orderInfos);
+        //删除购物车
+        return this.removeByIds(Arrays.asList(cardIdArr)) ? 1 : 0;
     }
 
 }

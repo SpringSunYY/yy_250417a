@@ -76,6 +76,18 @@
         <el-button
           type="success"
           plain
+          icon="el-icon-plus"
+          size="mini"
+          :disabled="multiple"
+          @click="handlePurchase"
+          v-hasPermi="['manage:orderInfo:add']"
+        >购买
+        </el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="success"
+          plain
           icon="el-icon-edit"
           size="mini"
           :disabled="single"
@@ -183,22 +195,65 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 添加或修改订房记录对话框 -->
+    <el-dialog :title="title" :visible.sync="openPurchase" width="600px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="收货地址" prop="addressId">
+          <el-select
+            style="width: 100%"
+            v-model="form.addressId"
+            filterable
+            remote
+            reserve-keyword
+            placeholder="请输入手机号码"
+            :remote-method="selectUserAddressList"
+            :loading="userAddressLoading"
+          >
+            <el-option
+              v-for="item in userAddressList"
+              :key="item.addressId"
+              :label="`${item.phone}-${item.province}-${item.city}-${item.county}-${item.address}`"
+              :value="item.addressId"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <!--        <el-form-item label="备注" prop="remark">-->
+        <!--          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"/>-->
+        <!--        </el-form-item>-->
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitPurchaseForm">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import {
-  listGoodsCardInfo,
-  getGoodsCardInfo,
-  delGoodsCardInfo,
   addGoodsCardInfo,
+  delGoodsCardInfo,
+  getGoodsCardInfo,
+  listGoodsCardInfo, payOrderCard,
   updateGoodsCardInfo
 } from '@/api/manage/goodsCardInfo'
+import { addOrderInfo } from '@/api/manage/orderInfo'
+import { listUserAddressInfo } from '@/api/manage/userAddressInfo'
 
 export default {
   name: 'GoodsCardInfo',
   data() {
     return {
+      userAddressList: [],
+      userAddressLoading: false,
+      userAddressQueryParams: {
+        userName: '',
+        pageNum: 1,
+        pageSize: 100
+      },
+      openPurchase: false,
       //表格展示列
       columns: [
         { key: 0, label: '编号', visible: false },
@@ -260,8 +315,56 @@ export default {
   },
   created() {
     this.getList()
+    this.getUserAddressList()
   },
   methods: {
+    /**
+     * 获取用户地址列表推荐
+     * @param query
+     */
+    selectUserAddressList(query) {
+      if (query !== '') {
+        this.userAddressLoading = true
+        this.userAddressQueryParams.phone = query
+        setTimeout(() => {
+          this.getUserAddressList()
+        }, 200)
+      } else {
+        this.userAddressList = []
+      }
+    },
+    /**
+     * 获取用户地址信息列表
+     */
+    getUserAddressList() {
+      //添加查询参数
+      if (this.form.userId != null) {
+        this.userAddressQueryParams.userId = this.form.userId
+      } else {
+        this.userAddressQueryParams.userId = null
+      }
+      if (this.userAddressQueryParams.userName != null) {
+        this.userAddressQueryParams.userId = null
+      }
+      listUserAddressInfo(this.userAddressQueryParams).then(res => {
+        this.userAddressList = res.rows
+        this.userAddressLoading = false
+      })
+    },
+    //购买
+    handlePurchase() {
+      this.title = '下单'
+      this.openPurchase = true
+    },
+    //提交购买商品
+    submitPurchaseForm() {
+      this.form.cardIds = this.ids.join(',')
+      payOrderCard(this.form).then(res => {
+        this.$modal.msgSuccess('购买成功,请在十五分钟内立即支付')
+        this.openPurchase = false
+        this.getList()
+      })
+    },
     /** 查询购物车列表 */
     getList() {
       this.loading = true
@@ -320,6 +423,7 @@ export default {
     handleAdd() {
       this.reset()
       this.open = true
+      this.openPurchase = false
       this.title = '添加购物车'
     },
     /** 修改按钮操作 */

@@ -183,9 +183,9 @@ export const dynamicRoutes = [
     permissions: ['manage:goodsInfo:list'],
     children: [
       {
-        path: 'index/:goodsId(\\d+)',
+        path: 'index/:goodsId',
         component: () => import('@/views/manage/goodsInfo/detail/index'),
-        name: 'Data',
+        name: 'GoodsDetail',
         meta: { title: '商品详情', activeMenu: '/index' }
       }
     ]

@@ -243,7 +243,7 @@ export default {
       this.title = '购买--' + this.goodsInfo.goodsName
       this.openPurchase = true
     },
-    //提交预定房间
+    //提交购买商品
     submitPurchaseForm() {
       addOrderInfo(this.form).then(res => {
         this.$modal.msgSuccess('购买成功,请在十五分钟内立即支付')

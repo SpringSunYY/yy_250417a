@@ -3,8 +3,12 @@ package com.lz.manage.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
+
+import com.lz.manage.model.dto.goodsCardInfo.GoodsCardPay;
 import org.springframework.security.access.prepost.PreAuthorize;
 import javax.annotation.Resource;
+
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -113,5 +117,12 @@ public class GoodsCardInfoController extends BaseController
     public AjaxResult remove(@PathVariable Long[] cardIds)
     {
         return toAjax(goodsCardInfoService.deleteGoodsCardInfoByCardIds(cardIds));
+    }
+
+    @PreAuthorize("@ss.hasPermi('manage:goodsCardInfo:remove')")
+    @Log(title = "购物车购买商品", businessType = BusinessType.INSERT)
+    @PostMapping("/pay")
+    public AjaxResult payOrderCard(@RequestBody @Validated GoodsCardPay goodsCardPay) {
+        return toAjax(goodsCardInfoService.payOrderCard(goodsCardPay));
     }
 }

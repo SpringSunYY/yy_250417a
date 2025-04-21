@@ -24,6 +24,13 @@ export function addGoodsCardInfo(data) {
     method: 'post',
     data: data
   })
+}// 新增购物车
+export function payOrderCard(data) {
+  return request({
+    url: '/manage/goodsCardInfo/pay',
+    method: 'post',
+    data: data
+  })
 }
 
 // 修改购物车

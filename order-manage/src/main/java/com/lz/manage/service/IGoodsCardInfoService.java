@@ -2,6 +2,7 @@ package com.lz.manage.service;
 
 import java.util.List;
 import com.lz.manage.model.domain.GoodsCardInfo;
+import com.lz.manage.model.dto.goodsCardInfo.GoodsCardPay;
 import com.lz.manage.model.vo.goodsCardInfo.GoodsCardInfoVo;
 import com.lz.manage.model.dto.goodsCardInfo.GoodsCardInfoQuery;
 
@@ -79,4 +80,12 @@ public interface IGoodsCardInfoService extends IService<GoodsCardInfo>
      * @return GoodsCardInfoVO集合
      */
     List<GoodsCardInfoVo> convertVoList(List<GoodsCardInfo> goodsCardInfoList);
+
+    /**
+     * 购物车下单
+     *
+     * @param goodsCardPay 支付订单对象
+     * @return 结果
+     */
+    int payOrderCard(GoodsCardPay goodsCardPay);
 }
