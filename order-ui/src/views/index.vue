@@ -3,6 +3,7 @@
     <el-row :gutter="20">
 
       <h1 style="font-size: 36px;text-align: center">保健品交易平台</h1>
+      <h2 style="font-size: 20px;text-align: center">{{ healthSlogan }}</h2>
       <el-row :gutter="20">
         <el-col :xs="24" :sm="4" :lg="4" v-for="(item,index) in goodsInfoList" :key="index">
           <el-card class="box-card" shadow="hover">
@@ -28,11 +29,13 @@
 
 <script>
 import { listGoodsInfo } from '@/api/manage/goodsInfo'
+import { getConfigKey } from '@/api/system/config'
 
 export default {
   name: 'Index',
   data() {
     return {
+      healthSlogan: '',
       // 版本号
       version: '3.8.9',
       // 酒店房间信息表格数据
@@ -51,6 +54,9 @@ export default {
   },
   created() {
     this.getList()
+    this.getConfigKey('health_slogan').then(res => {
+      this.healthSlogan = res.msg
+    })
   },
   methods: {
     /** 查询酒店房间信息列表 */
