@@ -38,6 +38,7 @@
                 and DATE_FORMAT(createTime, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}
             </if>
         </where>
+        order by create_time desc
     </select>
 
     <select id="selectRoomCommentInfoByCommentId" parameterType="Long" resultMap="RoomCommentInfoResult">

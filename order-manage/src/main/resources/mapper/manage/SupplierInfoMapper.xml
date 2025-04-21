@@ -22,14 +22,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectSupplierInfoList" parameterType="SupplierInfo" resultMap="SupplierInfoResult">
         <include refid="selectSupplierInfoVo"/>
-        <where>  
-            <if test="supplierId != null "> and supplier_id = #{supplierId}</if>
-            <if test="userId != null "> and user_id = #{userId}</if>
-            <if test="status != null "> and status = #{status}</if>
-            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''"> and DATE_FORMAT(create_time, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}</if>
-            <if test="updateBy != null  and updateBy != ''"> and update_by like concat('%', #{updateBy}, '%')</if>
-            <if test="params.beginUpdateTime != null and params.beginUpdateTime != '' and params.endUpdateTime != null and params.endUpdateTime != ''"> and DATE_FORMAT(update_time, '%Y-%m-%d') between #{params.beginUpdateTime} and #{params.endUpdateTime}</if>
+        <where>
+            <if test="supplierId != null ">and supplier_id = #{supplierId}</if>
+            <if test="userId != null ">and user_id = #{userId}</if>
+            <if test="status != null ">and status = #{status}</if>
+            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''">
+                and DATE_FORMAT(create_time, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}
+            </if>
+            <if test="updateBy != null  and updateBy != ''">and update_by like concat('%', #{updateBy}, '%')</if>
+            <if test="params.beginUpdateTime != null and params.beginUpdateTime != '' and params.endUpdateTime != null and params.endUpdateTime != ''">
+                and DATE_FORMAT(update_time, '%Y-%m-%d') between #{params.beginUpdateTime} and #{params.endUpdateTime}
+            </if>
         </where>
+        order by create_time desc
     </select>
     
     <select id="selectSupplierInfoBySupplierId" parameterType="Long" resultMap="SupplierInfoResult">

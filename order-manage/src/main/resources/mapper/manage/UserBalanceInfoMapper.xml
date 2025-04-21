@@ -1,31 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.lz.manage.mapper.UserBalanceInfoMapper">
-    
+
     <resultMap type="UserBalanceInfo" id="UserBalanceInfoResult">
-        <result property="balanceId"    column="balance_id"    />
-        <result property="userId"    column="user_id"    />
-        <result property="balance"    column="balance"    />
-        <result property="updateTime"    column="update_time"    />
-        <result property="createTime"    column="create_time"    />
+        <result property="balanceId" column="balance_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="balance" column="balance"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createTime" column="create_time"/>
     </resultMap>
 
     <sql id="selectUserBalanceInfoVo">
-        select balance_id, user_id, balance, update_time, create_time from tb_user_balance_info
+        select balance_id, user_id, balance, update_time, create_time
+        from tb_user_balance_info
     </sql>
 
     <select id="selectUserBalanceInfoList" parameterType="UserBalanceInfo" resultMap="UserBalanceInfoResult">
         <include refid="selectUserBalanceInfoVo"/>
-        <where>  
-            <if test="balanceId != null "> and balance_id = #{balanceId}</if>
-            <if test="userId != null "> and user_id = #{userId}</if>
-            <if test="params.beginUpdateTime != null and params.beginUpdateTime != '' and params.endUpdateTime != null and params.endUpdateTime != ''"> and DATE_FORMAT(update_time, '%Y-%m-%d') between #{params.beginUpdateTime} and #{params.endUpdateTime}</if>
-            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''"> and DATE_FORMAT(create_time, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}</if>
+        <where>
+            <if test="balanceId != null ">and balance_id = #{balanceId}</if>
+            <if test="userId != null ">and user_id = #{userId}</if>
+            <if test="params.beginUpdateTime != null and params.beginUpdateTime != '' and params.endUpdateTime != null and params.endUpdateTime != ''">
+                and DATE_FORMAT(update_time, '%Y-%m-%d') between #{params.beginUpdateTime} and #{params.endUpdateTime}
+            </if>
+            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''">
+                and DATE_FORMAT(create_time, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}
+            </if>
         </where>
+        order by create_time desc
     </select>
-    
+
     <select id="selectUserBalanceInfoByBalanceId" parameterType="Long" resultMap="UserBalanceInfoResult">
         <include refid="selectUserBalanceInfoVo"/>
         where balance_id = #{balanceId}
@@ -38,13 +44,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="balance != null">balance,</if>
             <if test="updateTime != null">update_time,</if>
             <if test="createTime != null">create_time,</if>
-         </trim>
+        </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="userId != null">#{userId},</if>
             <if test="balance != null">#{balance},</if>
             <if test="updateTime != null">#{updateTime},</if>
             <if test="createTime != null">#{createTime},</if>
-         </trim>
+        </trim>
     </insert>
 
     <update id="updateUserBalanceInfo" parameterType="UserBalanceInfo">
@@ -59,11 +65,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </update>
 
     <delete id="deleteUserBalanceInfoByBalanceId" parameterType="Long">
-        delete from tb_user_balance_info where balance_id = #{balanceId}
+        delete
+        from tb_user_balance_info
+        where balance_id = #{balanceId}
     </delete>
 
     <delete id="deleteUserBalanceInfoByBalanceIds" parameterType="String">
-        delete from tb_user_balance_info where balance_id in 
+        delete from tb_user_balance_info where balance_id in
         <foreach item="balanceId" collection="array" open="(" separator="," close=")">
             #{balanceId}
         </foreach>
