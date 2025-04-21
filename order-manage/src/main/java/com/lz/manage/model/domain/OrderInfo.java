@@ -33,14 +33,20 @@ public class OrderInfo implements Serializable
 
     /** 商品 */
     @Excel(name = "商品")
+    @TableField(exist = false)
+    private String goodsName;
     private Long goodsId;
 
     /** 用户 */
     @Excel(name = "用户")
+    @TableField(exist = false)
+    private String userName;
     private Long userId;
 
     /** 地址 */
     @Excel(name = "地址")
+    @TableField(exist = false)
+    private String addressName;
     private Long addressId;
 
     /** 价格 */
@@ -50,6 +56,12 @@ public class OrderInfo implements Serializable
     /** 状态 */
     @Excel(name = "状态")
     private Long historyStatus;
+
+    /** 供应商 */
+    @Excel(name = "供应商")
+    @TableField(exist = false)
+    private String supplierName;
+    private Long supplierId;
 
     /** 创建时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
