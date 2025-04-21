@@ -32,6 +32,8 @@ public class UserAddressInfo implements Serializable
 
     /** 用户 */
     @Excel(name = "用户")
+    @TableField(exist = false)
+    private String userName;
     private Long userId;
 
     /** 手机号码 */

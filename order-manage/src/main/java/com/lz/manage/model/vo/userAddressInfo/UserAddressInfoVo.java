@@ -26,6 +26,7 @@ public class UserAddressInfoVo implements Serializable
 
     /** 用户 */
     @Excel(name = "用户")
+    private String userName;
     private Long userId;
 
     /** 手机号码 */
