@@ -227,6 +227,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
                 throw new ServiceException("用户余额不足,订单编号--" + orderId);
             }
             //加入订单信息
+            userBalanceInfo.setUpdateTime(new Date());
             userBalanceInfo.setBalance(userBalanceInfo.getBalance().subtract(orderInfo.getTotalPrice()));
             userBalanceInfos.add(userBalanceInfo);
             orderInfo.setHistoryStatus(Long.parseLong(OrderStatus.ORDER_STATUS_1.getValue()));

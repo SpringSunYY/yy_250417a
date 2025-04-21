@@ -1,36 +1,45 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.lz.manage.mapper.RoomCommentInfoMapper">
-    
+
     <resultMap type="RoomCommentInfo" id="RoomCommentInfoResult">
-        <result property="commentId"    column="comment_id"    />
-        <result property="goodsId"    column="goods_id"    />
-        <result property="userId"    column="user_id"    />
-        <result property="score"    column="score"    />
-        <result property="content"    column="content"    />
-        <result property="imageUrls"    column="image_urls"    />
-        <result property="createTime"    column="createTime"    />
-        <result property="updateTime"    column="updateTime"    />
+        <result property="commentId" column="comment_id"/>
+        <result property="goodsId" column="goods_id"/>
+        <result property="orderId" column="order_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="score" column="score"/>
+        <result property="content" column="content"/>
+        <result property="imageUrls" column="image_urls"/>
+        <result property="createTime" column="createTime"/>
+        <result property="updateTime" column="updateTime"/>
     </resultMap>
 
     <sql id="selectRoomCommentInfoVo">
-        select comment_id, goods_id, user_id, score, content, image_urls, createTime, updateTime from tb_room_comment_info
+        select comment_id,
+               goods_id,
+               order_id,
+               user_id,
+               score,
+               content,
+               image_urls,
+               createTime,
+               updateTime
+        from tb_room_comment_info
     </sql>
 
     <select id="selectRoomCommentInfoList" parameterType="RoomCommentInfo" resultMap="RoomCommentInfoResult">
         <include refid="selectRoomCommentInfoVo"/>
-        <where>  
-            <if test="commentId != null "> and comment_id = #{commentId}</if>
-            <if test="goodsId != null "> and goods_id = #{goodsId}</if>
-            <if test="userId != null "> and user_id = #{userId}</if>
-            <if test="score != null "> and score = #{score}</if>
-            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''"> and DATE_FORMAT(createTime, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}</if>
-            <if test="params.beginUpdateTime != null and params.beginUpdateTime != '' and params.endUpdateTime != null and params.endUpdateTime != ''"> and DATE_FORMAT(updateTime, '%Y-%m-%d') between #{params.beginUpdateTime} and #{params.endUpdateTime}</if>
+        <where>
+            <if test="commentId != null ">and comment_id = #{commentId}</if>
+            <if test="goodsId != null ">and goods_id = #{goodsId}</if>
+            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''">
+                and DATE_FORMAT(createTime, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}
+            </if>
         </where>
     </select>
-    
+
     <select id="selectRoomCommentInfoByCommentId" parameterType="Long" resultMap="RoomCommentInfoResult">
         <include refid="selectRoomCommentInfoVo"/>
         where comment_id = #{commentId}
@@ -40,28 +49,31 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         insert into tb_room_comment_info
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="goodsId != null">goods_id,</if>
+            <if test="orderId != null">order_id,</if>
             <if test="userId != null">user_id,</if>
             <if test="score != null">score,</if>
             <if test="content != null and content != ''">content,</if>
             <if test="imageUrls != null">image_urls,</if>
             <if test="createTime != null">createTime,</if>
             <if test="updateTime != null">updateTime,</if>
-         </trim>
+        </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="goodsId != null">#{goodsId},</if>
+            <if test="orderId != null">#{orderId},</if>
             <if test="userId != null">#{userId},</if>
             <if test="score != null">#{score},</if>
             <if test="content != null and content != ''">#{content},</if>
             <if test="imageUrls != null">#{imageUrls},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateTime != null">#{updateTime},</if>
-         </trim>
+        </trim>
     </insert>
 
     <update id="updateRoomCommentInfo" parameterType="RoomCommentInfo">
         update tb_room_comment_info
         <trim prefix="SET" suffixOverrides=",">
             <if test="goodsId != null">goods_id = #{goodsId},</if>
+            <if test="orderId != null">order_id = #{orderId},</if>
             <if test="userId != null">user_id = #{userId},</if>
             <if test="score != null">score = #{score},</if>
             <if test="content != null and content != ''">content = #{content},</if>
@@ -73,11 +85,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </update>
 
     <delete id="deleteRoomCommentInfoByCommentId" parameterType="Long">
-        delete from tb_room_comment_info where comment_id = #{commentId}
+        delete
+        from tb_room_comment_info
+        where comment_id = #{commentId}
     </delete>
 
     <delete id="deleteRoomCommentInfoByCommentIds" parameterType="String">
-        delete from tb_room_comment_info where comment_id in 
+        delete from tb_room_comment_info where comment_id in
         <foreach item="commentId" collection="array" open="(" separator="," close=")">
             #{commentId}
         </foreach>

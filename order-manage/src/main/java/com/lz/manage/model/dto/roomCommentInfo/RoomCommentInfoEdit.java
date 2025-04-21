@@ -10,7 +10,7 @@ import com.lz.manage.model.domain.RoomCommentInfo;
  * 商品评价Vo对象 tb_room_comment_info
  *
  * @author YY
- * @date 2025-04-19
+ * @date 2025-04-21
  */
 @Data
 public class RoomCommentInfoEdit implements Serializable
@@ -22,6 +22,9 @@ public class RoomCommentInfoEdit implements Serializable
 
     /** 商品 */
     private Long goodsId;
+
+    /** 订单 */
+    private Long orderId;
 
     /** 评论用户 */
     private Long userId;

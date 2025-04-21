@@ -30,25 +30,25 @@
           end-placeholder="结束日期"
         ></el-date-picker>
       </el-form-item>
-<!--      <el-form-item label="更新人" prop="updateBy">-->
-<!--        <el-input-->
-<!--          v-model="queryParams.updateBy"-->
-<!--          placeholder="请输入更新人"-->
-<!--          clearable-->
-<!--          @keyup.enter.native="handleQuery"-->
-<!--        />-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="更新时间">-->
-<!--        <el-date-picker-->
-<!--          v-model="daterangeUpdateTime"-->
-<!--          style="width: 240px"-->
-<!--          value-format="yyyy-MM-dd"-->
-<!--          type="daterange"-->
-<!--          range-separator="-"-->
-<!--          start-placeholder="开始日期"-->
-<!--          end-placeholder="结束日期"-->
-<!--        ></el-date-picker>-->
-<!--      </el-form-item>-->
+      <!--      <el-form-item label="更新人" prop="updateBy">-->
+      <!--        <el-input-->
+      <!--          v-model="queryParams.updateBy"-->
+      <!--          placeholder="请输入更新人"-->
+      <!--          clearable-->
+      <!--          @keyup.enter.native="handleQuery"-->
+      <!--        />-->
+      <!--      </el-form-item>-->
+      <!--      <el-form-item label="更新时间">-->
+      <!--        <el-date-picker-->
+      <!--          v-model="daterangeUpdateTime"-->
+      <!--          style="width: 240px"-->
+      <!--          value-format="yyyy-MM-dd"-->
+      <!--          type="daterange"-->
+      <!--          range-separator="-"-->
+      <!--          start-placeholder="开始日期"-->
+      <!--          end-placeholder="结束日期"-->
+      <!--        ></el-date-picker>-->
+      <!--      </el-form-item>-->
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -162,6 +162,15 @@
             size="mini"
             type="text"
             icon="el-icon-edit"
+            v-if="scope.row.historyStatus==='1'"
+            @click="handleComment(scope.row)"
+            v-hasPermi="['manage:roomCommentInfo:add']"
+          >评价
+          </el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['manage:orderInfo:edit']"
           >修改
@@ -254,6 +263,31 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 添加或修改商品评价对话框 -->
+    <el-dialog :title="title" :visible.sync="openComment" width="500px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <!--        <el-form-item label="房间" prop="roomId">-->
+        <!--          <el-input v-model="form.roomId" placeholder="请输入房间"/>-->
+        <!--        </el-form-item>-->
+        <!--        <el-form-item label="评论用户" prop="userId">-->
+        <!--          <el-input v-model="form.userId" placeholder="请输入评论用户"/>-->
+        <!--        </el-form-item>-->
+        <el-form-item label="评分" prop="score">
+          <el-input-number :min="0" :max="5" v-model="form.score" placeholder="请输入评分"/>
+        </el-form-item>
+        <el-form-item label="评论内容">
+          <el-input type="textarea" placeholder="请输入评论内容" v-model="form.content" :min-height="192"/>
+        </el-form-item>
+        <el-form-item label="评论图片" prop="imageUrls">
+          <image-upload v-model="form.imageUrls"/>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitComment">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -267,12 +301,15 @@ import {
   payOrderInfo
 } from '@/api/manage/orderInfo'
 import { listUserAddressInfo } from '@/api/manage/userAddressInfo'
+import { addRoomCommentInfo } from '@/api/manage/roomCommentInfo'
 
 export default {
   name: 'OrderInfo',
   dicts: ['order_status'],
   data() {
     return {
+      //评论
+      openComment: false,
       userAddressList: [],
       userAddressLoading: false,
       userAddressQueryParams: {
@@ -361,6 +398,21 @@ export default {
     this.getUserAddressList()
   },
   methods: {
+    handleComment(row) {
+      this.reset()
+      this.title = '添加评论'
+      this.openComment = true
+      this.form.userId = row.userId
+      this.form.orderId = row.orderId
+      this.form.goodsId = row.goodsId
+    },
+    submitComment() {
+      addRoomCommentInfo(this.form).then(res => {
+        this.$modal.msgSuccess('评论成功')
+        this.openComment = false
+        this.getList()
+      })
+    },
     /**
      * 获取用户地址列表推荐
      * @param query

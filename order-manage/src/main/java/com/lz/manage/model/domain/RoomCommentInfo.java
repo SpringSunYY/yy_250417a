@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * 商品评价对象 tb_room_comment_info
  *
  * @author YY
- * @date 2025-04-19
+ * @date 2025-04-21
  */
 @TableName("tb_room_comment_info")
 @Data
@@ -32,10 +32,18 @@ public class RoomCommentInfo implements Serializable
 
     /** 商品 */
     @Excel(name = "商品")
+    @TableField(exist = false)
+    private String goodsName;
     private Long goodsId;
+
+    /** 订单 */
+    @Excel(name = "订单")
+    private Long orderId;
 
     /** 评论用户 */
     @Excel(name = "评论用户")
+    @TableField(exist = false)
+    private String userName;
     private Long userId;
 
     /** 评分 */

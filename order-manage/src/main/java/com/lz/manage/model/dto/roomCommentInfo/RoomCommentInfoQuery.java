@@ -15,7 +15,7 @@ import com.lz.manage.model.domain.RoomCommentInfo;
  * 商品评价Query对象 tb_room_comment_info
  *
  * @author YY
- * @date 2025-04-19
+ * @date 2025-04-21
  */
 @Data
 public class RoomCommentInfoQuery implements Serializable
@@ -28,19 +28,9 @@ public class RoomCommentInfoQuery implements Serializable
     /** 商品 */
     private Long goodsId;
 
-    /** 评论用户 */
-    private Long userId;
-
-    /** 评分 */
-    private Long score;
-
     /** 创建时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date createTime;
-
-    /** 更新时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date updateTime;
 
     /** 请求参数 */
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
