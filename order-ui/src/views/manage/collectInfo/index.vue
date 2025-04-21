@@ -116,7 +116,13 @@
       <el-table-column label="编号" align="center" v-if="columns[0].visible" prop="collectId"/>
       <el-table-column label="商品" :show-overflow-tooltip="true" align="center" v-if="columns[1].visible"
                        prop="goodsName"
-      />
+      >
+        <template slot-scope="scope">
+          <router-link :to="'/manage/goodsDetail/index/' + scope.row.goodsId" class="link-type">
+            <span>{{ scope.row.goodsName }}</span>
+          </router-link>
+        </template>
+      </el-table-column>
       <el-table-column label="用户" :show-overflow-tooltip="true" align="center" v-if="columns[2].visible"
                        prop="userName"
       />
