@@ -26,6 +26,7 @@ public class SupplierInfoVo implements Serializable
 
     /** 用户 */
     @Excel(name = "用户")
+    private String userName;
     private Long userId;
 
     /** 状态 */
@@ -34,6 +35,7 @@ public class SupplierInfoVo implements Serializable
 
     /** 审核人 */
     @Excel(name = "审核人")
+    private String auditUserName;
     private Long auditUserId;
 
     /** 审核描述 */

@@ -32,6 +32,8 @@ public class SupplierInfo implements Serializable
 
     /** 用户 */
     @Excel(name = "用户")
+    @TableField(exist = false)
+    private String userName;
     private Long userId;
 
     /** 状态 */
@@ -40,6 +42,8 @@ public class SupplierInfo implements Serializable
 
     /** 审核人 */
     @Excel(name = "审核人")
+    @TableField(exist = false)
+    private String auditUserName;
     private Long auditUserId;
 
     /** 审核描述 */
