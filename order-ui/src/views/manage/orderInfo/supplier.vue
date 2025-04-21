@@ -79,30 +79,30 @@
       <!--        >修改-->
       <!--        </el-button>-->
       <!--      </el-col>-->
-      <el-col :span="1.5">
-        <el-button
-          type="success"
-          plain
-          icon="el-icon-plus"
-          size="mini"
-          :disabled="multiple"
-          @click="handlePay"
-          v-hasPermi="['manage:orderInfo:add']"
-        >支付
-        </el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="danger"
-          plain
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['manage:orderInfo:remove']"
-        >删除
-        </el-button>
-      </el-col>
+<!--      <el-col :span="1.5">-->
+<!--        <el-button-->
+<!--          type="success"-->
+<!--          plain-->
+<!--          icon="el-icon-plus"-->
+<!--          size="mini"-->
+<!--          :disabled="multiple"-->
+<!--          @click="handlePay"-->
+<!--          v-hasPermi="['manage:orderInfo:add']"-->
+<!--        >支付-->
+<!--        </el-button>-->
+<!--      </el-col>-->
+<!--      <el-col :span="1.5">-->
+<!--        <el-button-->
+<!--          type="danger"-->
+<!--          plain-->
+<!--          icon="el-icon-delete"-->
+<!--          size="mini"-->
+<!--          :disabled="multiple"-->
+<!--          @click="handleDelete"-->
+<!--          v-hasPermi="['manage:orderInfo:remove']"-->
+<!--        >删除-->
+<!--        </el-button>-->
+<!--      </el-col>-->
       <el-col :span="1.5">
         <el-button
           type="warning"
@@ -156,35 +156,35 @@
       <el-table-column label="备注" :show-overflow-tooltip="true" align="center" v-if="columns[10].visible"
                        prop="remark"
       />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            v-if="scope.row.historyStatus==='1'"
-            @click="handleComment(scope.row)"
-            v-hasPermi="['manage:roomCommentInfo:add']"
-          >评价
-          </el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['manage:orderInfo:edit']"
-          >修改
-          </el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['manage:orderInfo:remove']"
-          >删除
-          </el-button>
-        </template>
-      </el-table-column>
+<!--      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">-->
+<!--        <template slot-scope="scope">-->
+<!--          <el-button-->
+<!--            size="mini"-->
+<!--            type="text"-->
+<!--            icon="el-icon-edit"-->
+<!--            v-if="scope.row.historyStatus==='1'"-->
+<!--            @click="handleComment(scope.row)"-->
+<!--            v-hasPermi="['manage:roomCommentInfo:add']"-->
+<!--          >评价-->
+<!--          </el-button>-->
+<!--          <el-button-->
+<!--            size="mini"-->
+<!--            type="text"-->
+<!--            icon="el-icon-edit"-->
+<!--            @click="handleUpdate(scope.row)"-->
+<!--            v-hasPermi="['manage:orderInfo:edit']"-->
+<!--          >修改-->
+<!--          </el-button>-->
+<!--          <el-button-->
+<!--            size="mini"-->
+<!--            type="text"-->
+<!--            icon="el-icon-delete"-->
+<!--            @click="handleDelete(scope.row)"-->
+<!--            v-hasPermi="['manage:orderInfo:remove']"-->
+<!--          >删除-->
+<!--          </el-button>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
     </el-table>
 
     <pagination
@@ -237,9 +237,9 @@
             </el-radio>
           </el-radio-group>
         </el-form-item>
-<!--        <el-form-item label="供应商" prop="supplierId">-->
-<!--          <el-input v-model="form.supplierId" placeholder="请输入供应商"/>-->
-<!--        </el-form-item>-->
+        <el-form-item label="供应商" prop="supplierId">
+          <el-input v-model="form.supplierId" placeholder="请输入供应商"/>
+        </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"/>
         </el-form-item>
@@ -473,8 +473,8 @@ export default {
         this.queryParams.params['beginUpdateTime'] = this.daterangeUpdateTime[0]
         this.queryParams.params['endUpdateTime'] = this.daterangeUpdateTime[1]
       }
-      if (!checkPermi(['manage:orderInfo:all'])) {
-        this.queryParams.userId = this.$store.state.user.id
+      if (!checkPermi(['manage:orderInfo:supplier:all'])) {
+        this.queryParams.supplierId = this.$store.state.user.id
       }
       listOrderInfo(this.queryParams).then(response => {
         this.orderInfoList = response.rows

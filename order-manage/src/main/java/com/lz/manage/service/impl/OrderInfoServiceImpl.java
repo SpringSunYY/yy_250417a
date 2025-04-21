@@ -84,7 +84,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
             if (StringUtils.isNotNull(user)) {
                 info.setUserName(user.getUserName());
             }
-            UserAddressInfo userAddressInfo = userAddressInfoService.selectUserAddressInfoByAddressId(info.getUserId());
+            UserAddressInfo userAddressInfo = userAddressInfoService.selectUserAddressInfoByAddressId(info.getAddressId());
             if (StringUtils.isNotNull(userAddressInfo)) {
                 info.setAddressName(StringUtils.format("{}-{}-{}-{}-{}",
                         userAddressInfo.getPhone(),
@@ -206,6 +206,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     @Override
     public int payOrderInfo(String orderIdsStr) {
         ArrayList<OrderInfo> orderInfos = new ArrayList<>();
+        ArrayList<GoodsInfo> goodsInfos = new ArrayList<>();
         ArrayList<UserBalanceInfo> userBalanceInfos = new ArrayList<>();
         ArrayList<UserBalanceInfo> supplierInfos = new ArrayList<>();
         String[] orderIds = orderIdsStr.split(",");
@@ -232,10 +233,23 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
             userBalanceInfos.add(userBalanceInfo);
             orderInfo.setHistoryStatus(Long.parseLong(OrderStatus.ORDER_STATUS_1.getValue()));
             orderInfos.add(orderInfo);
+
+            //查询商品
+            GoodsInfo goodsInfo = goodsInfoService.selectGoodsInfoByGoodsId(orderInfo.getGoodsId());
+            if (StringUtils.isNull(goodsInfo)) {
+                throw new ServiceException("商品不存在,订单编号--" + orderId);
+            }
+//            goodsInfo.setPurchaseNum(goodsInfo.getPurchaseNum() + 1);
+            goodsInfos.add(goodsInfo);
         }
 
         orderInfoMapper.updateById(orderInfos);
-        userBalanceInfoService.saveOrUpdateBatch(userBalanceInfos);
+//        userBalanceInfoService.saveOrUpdateBatch(userBalanceInfos);
+//        goodsInfoService.saveOrUpdateBatch(goodsInfos);
+        for (GoodsInfo info : goodsInfos) {
+            info.setPurchaseNum(info.getPurchaseNum() + 1);
+            goodsInfoService.updateGoodsInfo(info);
+        }
         for (OrderInfo orderInfo : orderInfos) {
             //为供应商充值
             UserBalanceInfo supplierBalanceInfo = userBalanceInfoService.selectUserBalanceInfoByUserId(orderInfo.getSupplierId());
@@ -245,12 +259,18 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
                 supplierBalanceInfo.setBalance(orderInfo.getTotalPrice());
                 supplierBalanceInfo.setCreateTime(new Date());
                 supplierBalanceInfo.setUpdateTime(new Date());
-            } else {
-                supplierBalanceInfo.setBalance(supplierBalanceInfo.getBalance().add(orderInfo.getTotalPrice()));
+                userBalanceInfoService.insertUserBalanceInfo(supplierBalanceInfo);
             }
-            supplierInfos.add(supplierBalanceInfo);
+            supplierBalanceInfo.setBalance(supplierBalanceInfo.getBalance().add(orderInfo.getTotalPrice()));
+            userBalanceInfoService.updateUserBalanceInfo(supplierBalanceInfo);
         }
-        return userBalanceInfoService.saveOrUpdateBatch(supplierInfos) ? 1 : 0;
+        //支付金额
+        for (OrderInfo orderInfo : orderInfos) {
+            UserBalanceInfo userBalanceInfo = userBalanceInfoService.selectUserBalanceInfoByUserId(orderInfo.getUserId());
+            userBalanceInfo.setBalance(userBalanceInfo.getBalance().subtract(orderInfo.getTotalPrice()));
+            userBalanceInfoService.updateUserBalanceInfo(userBalanceInfo);
+        }
+        return 1;
     }
 
 }

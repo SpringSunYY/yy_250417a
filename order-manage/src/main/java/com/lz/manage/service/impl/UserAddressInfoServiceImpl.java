@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
+import com.lz.common.annotation.DataScope;
 import com.lz.common.core.domain.entity.SysUser;
 import com.lz.common.utils.SecurityUtils;
 import com.lz.common.utils.StringUtils;
@@ -61,6 +62,7 @@ public class UserAddressInfoServiceImpl extends ServiceImpl<UserAddressInfoMappe
      * @return 用户地址
      */
     @Override
+    @DataScope(userAlias = "tb_user_address_info",deptAlias = "tb_user_address_info")
     public List<UserAddressInfo> selectUserAddressInfoList(UserAddressInfo userAddressInfo) {
         List<UserAddressInfo> userAddressInfos = userAddressInfoMapper.selectUserAddressInfoList(userAddressInfo);
         for (UserAddressInfo info : userAddressInfos) {

@@ -277,7 +277,7 @@ export default {
           { required: true, message: '用户不能为空', trigger: 'blur' }
         ],
         status: [
-          { required: true, message: '状态不能为空', trigger: 'change' }
+          { required: false, message: '状态不能为空', trigger: 'change' }
         ],
         createTime: [
           { required: true, message: '创建时间不能为空', trigger: 'blur' }

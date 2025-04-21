@@ -45,6 +45,9 @@
             <if test="params.beginUpdateTime != null and params.beginUpdateTime != '' and params.endUpdateTime != null and params.endUpdateTime != ''">
                 and DATE_FORMAT(update_time, '%Y-%m-%d') between #{params.beginUpdateTime} and #{params.endUpdateTime}
             </if>
+            <if test="userId != null">and user_id = #{userId}</if>
+            <if test="goodsId != null">and goods_id = #{goodsId}</if>
+            <if test="supplierId != null">and supplier_id = #{supplierId}</if>
         </where>
         order by create_time desc
     </select>

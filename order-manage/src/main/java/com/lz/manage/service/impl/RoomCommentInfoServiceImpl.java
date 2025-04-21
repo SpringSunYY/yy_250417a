@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
+import com.lz.common.annotation.DataScope;
 import com.lz.common.core.domain.entity.SysUser;
 import com.lz.common.exception.ServiceException;
 import com.lz.common.utils.SecurityUtils;
@@ -73,6 +74,7 @@ public class RoomCommentInfoServiceImpl extends ServiceImpl<RoomCommentInfoMappe
      * @return 商品评价
      */
     @Override
+//    @DataScope(userAlias = "tb_room_comment_info",deptAlias = "tb_room_comment_info")
     public List<RoomCommentInfo> selectRoomCommentInfoList(RoomCommentInfo roomCommentInfo) {
         List<RoomCommentInfo> roomCommentInfos = roomCommentInfoMapper.selectRoomCommentInfoList(roomCommentInfo);
         for (RoomCommentInfo info : roomCommentInfos) {

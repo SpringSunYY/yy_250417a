@@ -185,6 +185,7 @@ import {
   addRoomCommentInfo,
   updateRoomCommentInfo
 } from '@/api/manage/roomCommentInfo'
+import { checkPermi } from '@/utils/permission'
 
 export default {
   name: 'RoomCommentInfo',
@@ -275,6 +276,9 @@ export default {
       if (null != this.daterangeUpdateTime && '' != this.daterangeUpdateTime) {
         this.queryParams.params['beginUpdateTime'] = this.daterangeUpdateTime[0]
         this.queryParams.params['endUpdateTime'] = this.daterangeUpdateTime[1]
+      }
+      if(!checkPermi(['manage:roomCommentInfo:all'])) {
+        this.queryParams.userId = this.$store.state.user.id
       }
       listRoomCommentInfo(this.queryParams).then(response => {
         this.roomCommentInfoList = response.rows

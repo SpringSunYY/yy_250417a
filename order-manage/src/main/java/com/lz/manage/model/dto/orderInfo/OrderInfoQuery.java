@@ -32,6 +32,9 @@ public class OrderInfoQuery implements Serializable
     /** 用户 */
     private Long userId;
 
+    /** 供应商 */
+    private Long supplierId;
+
     /** 状态 */
     private Long historyStatus;
 

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.lz.common.annotation.DataScope;
 import com.lz.common.core.domain.entity.SysUser;
 import com.lz.common.exception.ServiceException;
 import com.lz.common.utils.SecurityUtils;
@@ -66,6 +67,7 @@ public class CollectInfoServiceImpl extends ServiceImpl<CollectInfoMapper, Colle
      * @return 商品收藏
      */
     @Override
+    @DataScope(userAlias = "tb_collect_info",deptAlias = "tb_collect_info")
     public List<CollectInfo> selectCollectInfoList(CollectInfo collectInfo)
     {
         List<CollectInfo> collectInfos = collectInfoMapper.selectCollectInfoList(collectInfo);

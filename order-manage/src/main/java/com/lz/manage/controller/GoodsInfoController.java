@@ -42,7 +42,7 @@ public class GoodsInfoController extends BaseController
     /**
      * 查询商品信息列表
      */
-    @PreAuthorize("@ss.hasPermi('manage:goodsInfo:list')")
+    @PreAuthorize("@ss.hasAnyPermi('manage:goodsInfo:list,manage:goodsInfo:query')")
     @GetMapping("/list")
     public TableDataInfo list(GoodsInfoQuery goodsInfoQuery)
     {

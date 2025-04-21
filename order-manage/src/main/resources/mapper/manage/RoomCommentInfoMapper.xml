@@ -32,6 +32,7 @@
     <select id="selectRoomCommentInfoList" parameterType="RoomCommentInfo" resultMap="RoomCommentInfoResult">
         <include refid="selectRoomCommentInfoVo"/>
         <where>
+            <if test="userId != null ">and user_id = #{userId}</if>
             <if test="commentId != null ">and comment_id = #{commentId}</if>
             <if test="goodsId != null ">and goods_id = #{goodsId}</if>
             <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''">

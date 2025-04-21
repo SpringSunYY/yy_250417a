@@ -180,7 +180,7 @@ export const dynamicRoutes = [
     path: '/manage/goodsDetail',
     component: Layout,
     hidden: true,
-    permissions: ['manage:goodsInfo:list'],
+    permissions: ['manage:goodsInfo:query'],
     children: [
       {
         path: 'index/:goodsId',

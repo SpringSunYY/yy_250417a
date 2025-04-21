@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.lz.common.annotation.DataScope;
 import com.lz.common.core.domain.entity.SysUser;
 import com.lz.common.exception.ServiceException;
 import com.lz.common.utils.SecurityUtils;
@@ -78,6 +79,7 @@ public class GoodsCardInfoServiceImpl extends ServiceImpl<GoodsCardInfoMapper, G
      * @return 购物车
      */
     @Override
+    @DataScope(userAlias = "tb_goods_card_info",deptAlias = "tb_goods_card_info")
     public List<GoodsCardInfo> selectGoodsCardInfoList(GoodsCardInfo goodsCardInfo) {
         List<GoodsCardInfo> goodsCardInfos = goodsCardInfoMapper.selectGoodsCardInfoList(goodsCardInfo);
         for (GoodsCardInfo info : goodsCardInfos) {

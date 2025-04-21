@@ -46,7 +46,7 @@ public class GoodsCardInfoController extends BaseController
     /**
      * 查询购物车列表
      */
-    @PreAuthorize("@ss.hasAnyPermi('manage:goodsCardInfo:list,manage:goodsCardInfo:query')")
+    @PreAuthorize("@ss.hasPermi('manage:goodsCardInfo:list')")
     @GetMapping("/list")
     public TableDataInfo list(GoodsCardInfoQuery goodsCardInfoQuery)
     {

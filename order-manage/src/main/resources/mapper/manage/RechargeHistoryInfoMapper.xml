@@ -43,6 +43,8 @@
             <if test="params.beginUpdateTime != null and params.beginUpdateTime != '' and params.endUpdateTime != null and params.endUpdateTime != ''">
                 and DATE_FORMAT(update_time, '%Y-%m-%d') between #{params.beginUpdateTime} and #{params.endUpdateTime}
             </if>
+            <!-- 数据范围过滤 -->
+            ${params.dataScope}
         </where>
         order by create_time desc
     </select>

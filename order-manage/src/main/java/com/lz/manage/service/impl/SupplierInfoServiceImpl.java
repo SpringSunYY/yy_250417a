@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
+import com.lz.common.annotation.DataScope;
 import com.lz.common.core.domain.entity.SysUser;
 import com.lz.common.utils.SecurityUtils;
 import com.lz.common.utils.StringUtils;
@@ -62,6 +63,7 @@ public class SupplierInfoServiceImpl extends ServiceImpl<SupplierInfoMapper, Sup
      * @return 供应商申请
      */
     @Override
+    @DataScope(userAlias = "tb_supplier_info",deptAlias = "tb_supplier_info")
     public List<SupplierInfo> selectSupplierInfoList(SupplierInfo supplierInfo) {
         List<SupplierInfo> supplierInfos = supplierInfoMapper.selectSupplierInfoList(supplierInfo);
         for (SupplierInfo info : supplierInfos) {
