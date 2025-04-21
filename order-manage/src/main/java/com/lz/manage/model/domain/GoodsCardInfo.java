@@ -3,7 +3,6 @@ package com.lz.manage.model.domain;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Date;
-import java.math.BigDecimal;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -15,21 +14,21 @@ import com.lz.common.annotation.Excel;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 /**
- * 订单信息对象 tb_order_info
+ * 购物车对象 tb_goods_card_info
  *
  * @author YY
  * @date 2025-04-21
  */
-@TableName("tb_order_info")
+@TableName("tb_goods_card_info")
 @Data
-public class OrderInfo implements Serializable
+public class GoodsCardInfo implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
     /** 编号 */
     @Excel(name = "编号")
-    @TableId(value = "order_id", type = IdType.ASSIGN_ID)
-    private Long orderId;
+    @TableId(value = "card_id", type = IdType.ASSIGN_ID)
+    private Long cardId;
 
     /** 商品 */
     @Excel(name = "商品")
@@ -38,18 +37,6 @@ public class OrderInfo implements Serializable
     /** 用户 */
     @Excel(name = "用户")
     private Long userId;
-
-    /** 地址 */
-    @Excel(name = "地址")
-    private Long addressId;
-
-    /** 价格 */
-    @Excel(name = "价格")
-    private BigDecimal totalPrice;
-
-    /** 状态 */
-    @Excel(name = "状态")
-    private Long historyStatus;
 
     /** 创建时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")

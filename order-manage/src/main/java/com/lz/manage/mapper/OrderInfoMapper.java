@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * 订单信息Mapper接口
  * 
  * @author YY
- * @date 2025-04-19
+ * @date 2025-04-21
  */
 public interface OrderInfoMapper extends BaseMapper<OrderInfo>
 {

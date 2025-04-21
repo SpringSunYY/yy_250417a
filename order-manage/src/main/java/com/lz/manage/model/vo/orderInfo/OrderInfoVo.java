@@ -14,7 +14,7 @@ import com.lz.manage.model.domain.OrderInfo;
  * 订单信息Vo对象 tb_order_info
  *
  * @author YY
- * @date 2025-04-19
+ * @date 2025-04-21
  */
 @Data
 public class OrderInfoVo implements Serializable
@@ -32,6 +32,10 @@ public class OrderInfoVo implements Serializable
     /** 用户 */
     @Excel(name = "用户")
     private Long userId;
+
+    /** 地址 */
+    @Excel(name = "地址")
+    private Long addressId;
 
     /** 价格 */
     @Excel(name = "价格")

@@ -1,8 +1,7 @@
-package com.lz.manage.model.dto.orderInfo;
+package com.lz.manage.model.dto.goodsCardInfo;
 
 import java.util.Map;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
@@ -11,29 +10,26 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.beans.BeanUtils;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.lz.manage.model.domain.OrderInfo;
+import com.lz.manage.model.domain.GoodsCardInfo;
 /**
- * 订单信息Query对象 tb_order_info
+ * 购物车Query对象 tb_goods_card_info
  *
  * @author YY
  * @date 2025-04-21
  */
 @Data
-public class OrderInfoQuery implements Serializable
+public class GoodsCardInfoQuery implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
     /** 编号 */
-    private Long orderId;
+    private Long cardId;
 
     /** 商品 */
     private Long goodsId;
 
     /** 用户 */
     private Long userId;
-
-    /** 状态 */
-    private Long historyStatus;
 
     /** 创建时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -54,15 +50,15 @@ public class OrderInfoQuery implements Serializable
     /**
      * 对象转封装类
      *
-     * @param orderInfoQuery 查询对象
-     * @return OrderInfo
+     * @param goodsCardInfoQuery 查询对象
+     * @return GoodsCardInfo
      */
-    public static OrderInfo queryToObj(OrderInfoQuery orderInfoQuery) {
-        if (orderInfoQuery == null) {
+    public static GoodsCardInfo queryToObj(GoodsCardInfoQuery goodsCardInfoQuery) {
+        if (goodsCardInfoQuery == null) {
             return null;
         }
-        OrderInfo orderInfo = new OrderInfo();
-        BeanUtils.copyProperties(orderInfoQuery, orderInfo);
-        return orderInfo;
+        GoodsCardInfo goodsCardInfo = new GoodsCardInfo();
+        BeanUtils.copyProperties(goodsCardInfoQuery, goodsCardInfo);
+        return goodsCardInfo;
     }
 }
