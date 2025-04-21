@@ -41,4 +41,10 @@ export function delOrderInfo(orderId) {
     url: '/manage/orderInfo/' + orderId,
     method: 'delete'
   })
+}// 删除订单信息
+export function payOrderInfo(orderId) {
+  return request({
+    url: '/manage/orderInfo/pay/' + orderId,
+    method: 'get'
+  })
 }

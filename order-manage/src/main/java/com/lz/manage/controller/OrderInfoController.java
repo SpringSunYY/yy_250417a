@@ -114,4 +114,14 @@ public class OrderInfoController extends BaseController
     {
         return toAjax(orderInfoService.deleteOrderInfoByOrderIds(orderIds));
     }
+
+    /**
+     * 删除订单信息
+     */
+    @PreAuthorize("@ss.hasPermi('manage:orderInfo:add')")
+    @Log(title = "支付订单信息", businessType = BusinessType.UPDATE)
+    @GetMapping("/pay/{orderIds}")
+    public AjaxResult payOrderInfo(@PathVariable String orderIds) {
+        return toAjax(orderInfoService.payOrderInfo(orderIds));
+    }
 }

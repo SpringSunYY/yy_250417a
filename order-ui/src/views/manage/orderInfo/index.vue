@@ -56,29 +56,41 @@
     </el-form>
 
     <el-row :gutter="10" class="mb8">
-<!--      <el-col :span="1.5">-->
-<!--        <el-button-->
-<!--          type="primary"-->
-<!--          plain-->
-<!--          icon="el-icon-plus"-->
-<!--          size="mini"-->
-<!--          @click="handleAdd"-->
-<!--          v-hasPermi="['manage:orderInfo:add']"-->
-<!--        >新增-->
-<!--        </el-button>-->
-<!--      </el-col>-->
-<!--      <el-col :span="1.5">-->
-<!--        <el-button-->
-<!--          type="success"-->
-<!--          plain-->
-<!--          icon="el-icon-edit"-->
-<!--          size="mini"-->
-<!--          :disabled="single"-->
-<!--          @click="handleUpdate"-->
-<!--          v-hasPermi="['manage:orderInfo:edit']"-->
-<!--        >修改-->
-<!--        </el-button>-->
-<!--      </el-col>-->
+      <!--      <el-col :span="1.5">-->
+      <!--        <el-button-->
+      <!--          type="primary"-->
+      <!--          plain-->
+      <!--          icon="el-icon-plus"-->
+      <!--          size="mini"-->
+      <!--          @click="handleAdd"-->
+      <!--          v-hasPermi="['manage:orderInfo:add']"-->
+      <!--        >新增-->
+      <!--        </el-button>-->
+      <!--      </el-col>-->
+      <!--      <el-col :span="1.5">-->
+      <!--        <el-button-->
+      <!--          type="success"-->
+      <!--          plain-->
+      <!--          icon="el-icon-edit"-->
+      <!--          size="mini"-->
+      <!--          :disabled="single"-->
+      <!--          @click="handleUpdate"-->
+      <!--          v-hasPermi="['manage:orderInfo:edit']"-->
+      <!--        >修改-->
+      <!--        </el-button>-->
+      <!--      </el-col>-->
+      <el-col :span="1.5">
+        <el-button
+          type="success"
+          plain
+          icon="el-icon-plus"
+          size="mini"
+          :disabled="multiple"
+          @click="handlePay"
+          v-hasPermi="['manage:orderInfo:add']"
+        >支付
+        </el-button>
+      </el-col>
       <el-col :span="1.5">
         <el-button
           type="danger"
@@ -146,14 +158,14 @@
       />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-<!--          <el-button-->
-<!--            size="mini"-->
-<!--            type="text"-->
-<!--            icon="el-icon-edit"-->
-<!--            @click="handleUpdate(scope.row)"-->
-<!--            v-hasPermi="['manage:orderInfo:edit']"-->
-<!--          >修改-->
-<!--          </el-button>-->
+          <!--          <el-button-->
+          <!--            size="mini"-->
+          <!--            type="text"-->
+          <!--            icon="el-icon-edit"-->
+          <!--            @click="handleUpdate(scope.row)"-->
+          <!--            v-hasPermi="['manage:orderInfo:edit']"-->
+          <!--          >修改-->
+          <!--          </el-button>-->
           <el-button
             size="mini"
             type="text"
@@ -211,20 +223,42 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+    <el-dialog :title="title" :visible.sync="openPay" width="500px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="价格" prop="totalPrice">
+          <el-input readonly v-model="totalPrice" placeholder="请输入价格"/>
+        </el-form-item>
+        <el-form-item label="备注" prop="remark">
+          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"/>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitFormPay">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listOrderInfo, getOrderInfo, delOrderInfo, addOrderInfo, updateOrderInfo } from '@/api/manage/orderInfo'
+import {
+  listOrderInfo,
+  getOrderInfo,
+  delOrderInfo,
+  addOrderInfo,
+  updateOrderInfo,
+  payOrderInfo
+} from '@/api/manage/orderInfo'
 
 export default {
   name: 'OrderInfo',
   dicts: ['order_status'],
   data() {
     return {
+      openPay: false,
       //表格展示列
       columns: [
-        { key: 0, label: '编号', visible: false },
+        { key: 0, label: '编号', visible: true },
         { key: 1, label: '商品', visible: true },
         { key: 2, label: '用户', visible: true },
         { key: 3, label: '地址', visible: true },
@@ -240,6 +274,7 @@ export default {
       loading: true,
       // 选中数组
       ids: [],
+      totalPrice: 0,
       // 非单个禁用
       single: true,
       // 非多个禁用
@@ -300,6 +335,19 @@ export default {
     this.getList()
   },
   methods: {
+    submitFormPay() {
+      console.log(this.form)
+      payOrderInfo(this.ids).then(res => {
+          this.openPay = false
+          this.getList()
+          this.$modal.msgSuccess('支付成功')
+        }
+      )
+    },
+    handlePay() {
+      this.title = '支付订单'
+      this.openPay = true
+    },
     /** 查询订单信息列表 */
     getList() {
       this.loading = true
@@ -321,11 +369,13 @@ export default {
     // 取消按钮
     cancel() {
       this.open = false
+      this.openPay = false
       this.reset()
     },
     // 表单重置
     reset() {
       this.form = {
+        ids: [],
         orderId: null,
         goodsId: null,
         userId: null,
@@ -354,7 +404,12 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
+      this.totalPrice = 0
+      this.reset()
       this.ids = selection.map(item => item.orderId)
+      this.totalPrice = selection.reduce((total, item) => {
+        return total + item.totalPrice
+      }, 0)
       this.single = selection.length !== 1
       this.multiple = !selection.length
     },

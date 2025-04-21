@@ -1,38 +1,35 @@
 package com.lz.manage.service.impl;
 
-import java.util.*;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.stream.Collectors;
-
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lz.common.core.domain.entity.SysUser;
 import com.lz.common.exception.ServiceException;
+import com.lz.common.utils.DateUtils;
 import com.lz.common.utils.SecurityUtils;
 import com.lz.common.utils.StringUtils;
-
-import java.math.BigDecimal;
-import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.lz.common.utils.DateUtils;
-
-import javax.annotation.Resource;
-
+import com.lz.manage.mapper.OrderInfoMapper;
 import com.lz.manage.model.domain.GoodsInfo;
+import com.lz.manage.model.domain.OrderInfo;
 import com.lz.manage.model.domain.UserAddressInfo;
+import com.lz.manage.model.domain.UserBalanceInfo;
+import com.lz.manage.model.dto.orderInfo.OrderInfoQuery;
 import com.lz.manage.model.enums.AuditCommonStatus;
+import com.lz.manage.model.enums.OrderStatus;
+import com.lz.manage.model.vo.orderInfo.OrderInfoVo;
 import com.lz.manage.service.IGoodsInfoService;
+import com.lz.manage.service.IOrderInfoService;
 import com.lz.manage.service.IUserAddressInfoService;
+import com.lz.manage.service.IUserBalanceInfoService;
 import com.lz.system.service.ISysUserService;
 import org.springframework.stereotype.Service;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.lz.manage.mapper.OrderInfoMapper;
-import com.lz.manage.model.domain.OrderInfo;
-import com.lz.manage.service.IOrderInfoService;
-import com.lz.manage.model.dto.orderInfo.OrderInfoQuery;
-import com.lz.manage.model.vo.orderInfo.OrderInfoVo;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 订单信息Service业务层处理
@@ -53,6 +50,12 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
 
     @Resource
     private IUserAddressInfoService userAddressInfoService;
+
+    @Resource
+    private IUserBalanceInfoService userBalanceInfoService;
+
+    @Resource
+    private TransactionTemplate transactionTemplate;
 
     //region mybatis代码
 
@@ -198,6 +201,41 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
             return Collections.emptyList();
         }
         return orderInfoList.stream().map(OrderInfoVo::objToVo).collect(Collectors.toList());
+    }
+
+    @Override
+    public int payOrderInfo(String orderIdsStr) {
+        ArrayList<OrderInfo> orderInfos = new ArrayList<>();
+        ArrayList<UserBalanceInfo> userBalanceInfos = new ArrayList<>();
+        String[] orderIds = orderIdsStr.split(",");
+        for (String orderIdStr : orderIds) {
+            Long orderId = Long.parseLong(orderIdStr);
+            OrderInfo orderInfo = orderInfoMapper.selectOrderInfoByOrderId(orderId);
+            if (StringUtils.isNull(orderInfo)) {
+                throw new ServiceException("订单不存在");
+            }
+            if (orderInfo.getHistoryStatus().toString().equals(OrderStatus.ORDER_STATUS_1.getValue())) {
+                throw new ServiceException("订单已支付,订单编号--" + orderId);
+            }
+            //判断用户余额
+            UserBalanceInfo userBalanceInfo = userBalanceInfoService.selectUserBalanceInfoByUserId(orderInfo.getUserId());
+            if (StringUtils.isNull(userBalanceInfo)) {
+                throw new ServiceException("用户余额不足,订单编号--" + orderId);
+            }
+            if (userBalanceInfo.getBalance().compareTo(orderInfo.getTotalPrice()) < 0) {
+                throw new ServiceException("用户余额不足,订单编号--" + orderId);
+            }
+            //加入订单信息
+            userBalanceInfo.setBalance(userBalanceInfo.getBalance().subtract(orderInfo.getTotalPrice()));
+            userBalanceInfos.add(userBalanceInfo);
+            orderInfo.setHistoryStatus(Long.parseLong(OrderStatus.ORDER_STATUS_1.getValue()));
+            orderInfos.add(orderInfo);
+        }
+        Boolean execute = transactionTemplate.execute(result -> {
+            orderInfoMapper.updateById(orderInfos);
+            return userBalanceInfoService.updateBatchById(userBalanceInfos);
+        });
+        return StringUtils.isNotNull(execute) ? execute ? 1 : 0 : 0;
     }
 
 }
