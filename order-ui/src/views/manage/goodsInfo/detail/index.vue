@@ -17,6 +17,7 @@
         <strong>
           <el-button type="text" @click="handlePurchase">立即购买</el-button>
           <el-button type="text" @click="handleCollect">收藏商品</el-button>
+          <el-button type="text" @click="handleCard">加入购物车</el-button>
         </strong>
       </p>
     </el-card>
@@ -85,6 +86,7 @@ import { getGoodsInfo } from '@/api/manage/goodsInfo'
 import { addOrderInfo } from '@/api/manage/orderInfo'
 import { listUserAddressInfo } from '@/api/manage/userAddressInfo'
 import { addCollectInfo } from '@/api/manage/collectInfo'
+import { addGoodsCardInfo } from '@/api/manage/goodsCardInfo'
 
 export default {
   name: 'RoomDetail',
@@ -167,6 +169,9 @@ export default {
     this.getUserAddressList()
   },
   methods: {
+    /**
+     * 收藏商品
+     */
     handleCollect() {
       const goodsIds = this.form.goodsId
       this.$modal.confirm('是否确认收藏商品？').then(function() {
@@ -174,6 +179,19 @@ export default {
       }).then(() => {
         this.getList()
         this.$modal.msgSuccess('收藏成功')
+      }).catch(() => {
+      })
+    },
+    /**
+     * 加入购物车
+     */
+    handleCard() {
+      const goodsIds = this.form.goodsId
+      this.$modal.confirm('是否确认加入购物车？').then(function() {
+        return addGoodsCardInfo({ goodsId: goodsIds })
+      }).then(() => {
+        this.getList()
+        this.$modal.msgSuccess('加入成功')
       }).catch(() => {
       })
     },

@@ -32,10 +32,14 @@ public class GoodsCardInfo implements Serializable
 
     /** 商品 */
     @Excel(name = "商品")
+    @TableField(exist = false)
+    private String goodsName;
     private Long goodsId;
 
     /** 用户 */
     @Excel(name = "用户")
+    @TableField(exist = false)
+    private String userName;
     private Long userId;
 
     /** 创建时间 */
