@@ -4,6 +4,7 @@
 
       <h1 style="font-size: 36px;text-align: center">保健品交易平台</h1>
       <h2 style="font-size: 20px;text-align: center">{{ healthSlogan }}</h2>
+      <h2 style="font-size: 36px;font-weight: bold">热门商品</h2>
       <el-row :gutter="20">
         <el-col :xs="24" :sm="4" :lg="4" v-for="(item,index) in goodsInfoList" :key="index">
           <el-card class="box-card" shadow="hover">
