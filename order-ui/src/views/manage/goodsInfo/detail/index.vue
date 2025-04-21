@@ -13,9 +13,12 @@
       <p><strong>价格：</strong> ¥{{ goodsInfo.goodsPrice }}</p>
       <p><strong>描述：</strong> {{ goodsInfo.goodsDesc }}</p>
       <p><strong>销量：</strong> {{ goodsInfo.purchaseNum }}</p>
-      <p><strong>
-        <el-button type="text" @click="handlePurchase">立即购买</el-button>
-      </strong></p>
+      <p>
+        <strong>
+          <el-button type="text" @click="handlePurchase">立即购买</el-button>
+          <el-button type="text" @click="handleCollect">收藏商品</el-button>
+        </strong>
+      </p>
     </el-card>
     <!-- 添加或修改订房记录对话框 -->
     <el-dialog :title="title" :visible.sync="openPurchase" width="600px" append-to-body>
@@ -81,6 +84,7 @@ import { listRoomCommentInfo } from '@/api/manage/roomCommentInfo'
 import { getGoodsInfo } from '@/api/manage/goodsInfo'
 import { addOrderInfo } from '@/api/manage/orderInfo'
 import { listUserAddressInfo } from '@/api/manage/userAddressInfo'
+import { addCollectInfo } from '@/api/manage/collectInfo'
 
 export default {
   name: 'RoomDetail',
@@ -163,6 +167,16 @@ export default {
     this.getUserAddressList()
   },
   methods: {
+    handleCollect() {
+      const goodsIds = this.form.goodsId
+      this.$modal.confirm('是否确认收藏商品？').then(function() {
+        return addCollectInfo({ goodsId: goodsIds })
+      }).then(() => {
+        this.getList()
+        this.$modal.msgSuccess('收藏成功')
+      }).catch(() => {
+      })
+    },
     /**
      * 获取用户地址列表推荐
      * @param query

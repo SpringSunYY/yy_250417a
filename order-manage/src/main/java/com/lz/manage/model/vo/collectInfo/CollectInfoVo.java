@@ -26,10 +26,12 @@ public class CollectInfoVo implements Serializable
 
     /** 商品 */
     @Excel(name = "商品")
+    private String goodsName;
     private Long goodsId;
 
     /** 用户 */
     @Excel(name = "用户")
+    private String userName;
     private Long userId;
 
     /** 创建时间 */

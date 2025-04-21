@@ -5,11 +5,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.stream.Collectors;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.lz.common.core.domain.entity.SysUser;
+import com.lz.common.exception.ServiceException;
+import com.lz.common.utils.SecurityUtils;
 import com.lz.common.utils.StringUtils;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.lz.common.utils.DateUtils;
 import javax.annotation.Resource;
+
+import com.lz.manage.model.domain.GoodsInfo;
+import com.lz.manage.service.IGoodsInfoService;
+import com.lz.system.service.ISysUserService;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -30,6 +39,12 @@ public class CollectInfoServiceImpl extends ServiceImpl<CollectInfoMapper, Colle
 {
     @Resource
     private CollectInfoMapper collectInfoMapper;
+
+    @Resource
+    private ISysUserService userService;
+
+    @Resource
+    private IGoodsInfoService goodsInfoService;
 
     //region mybatis代码
     /**
@@ -53,7 +68,19 @@ public class CollectInfoServiceImpl extends ServiceImpl<CollectInfoMapper, Colle
     @Override
     public List<CollectInfo> selectCollectInfoList(CollectInfo collectInfo)
     {
-        return collectInfoMapper.selectCollectInfoList(collectInfo);
+        List<CollectInfo> collectInfos = collectInfoMapper.selectCollectInfoList(collectInfo);
+        for (CollectInfo info : collectInfos) {
+            SysUser user = userService.selectUserById(info.getUserId());
+            if (StringUtils.isNotNull(user)) {
+                info.setUserName(user.getUserName());
+            }
+
+            GoodsInfo goodsInfo = goodsInfoService.selectGoodsInfoByGoodsId(info.getGoodsId());
+            if (StringUtils.isNotNull(goodsInfo)) {
+                info.setGoodsName(goodsInfo.getGoodsName());
+            }
+        }
+        return collectInfos;
     }
 
     /**
@@ -65,6 +92,19 @@ public class CollectInfoServiceImpl extends ServiceImpl<CollectInfoMapper, Colle
     @Override
     public int insertCollectInfo(CollectInfo collectInfo)
     {
+        //查询商品是否存在
+        GoodsInfo goodsInfo = goodsInfoService.selectGoodsInfoByGoodsId(collectInfo.getGoodsId());
+        if (StringUtils.isNull(goodsInfo)) {
+            throw new ServiceException("商品不存在");
+        }
+        //根据用户ID和商品ID查询是否已经收藏过
+        CollectInfo collectInfoDb = this.getOne(new LambdaQueryWrapper<CollectInfo>()
+                .eq(CollectInfo::getGoodsId, collectInfo.getGoodsId())
+                .eq(CollectInfo::getUserId, SecurityUtils.getUserId()));
+        if (StringUtils.isNotNull(collectInfoDb)) {
+            throw new ServiceException("商品已经收藏过");
+        }
+        collectInfo.setUserId(SecurityUtils.getUserId());
         collectInfo.setCreateTime(DateUtils.getNowDate());
         return collectInfoMapper.insertCollectInfo(collectInfo);
     }
@@ -78,6 +118,7 @@ public class CollectInfoServiceImpl extends ServiceImpl<CollectInfoMapper, Colle
     @Override
     public int updateCollectInfo(CollectInfo collectInfo)
     {
+        collectInfo.setUpdateBy(SecurityUtils.getUsername());
         collectInfo.setUpdateTime(DateUtils.getNowDate());
         return collectInfoMapper.updateCollectInfo(collectInfo);
     }
