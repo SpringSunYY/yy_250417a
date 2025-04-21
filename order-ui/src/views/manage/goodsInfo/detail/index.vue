@@ -93,7 +93,7 @@ export default {
         pageNum: 1,
         pageSize: 100
       },
-      title: '预定房间',
+      title: '购买商品',
       openPurchase: false,
       form: {
         goodsId: '',

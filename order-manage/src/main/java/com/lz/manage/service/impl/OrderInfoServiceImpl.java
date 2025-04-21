@@ -207,6 +207,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     public int payOrderInfo(String orderIdsStr) {
         ArrayList<OrderInfo> orderInfos = new ArrayList<>();
         ArrayList<UserBalanceInfo> userBalanceInfos = new ArrayList<>();
+        ArrayList<UserBalanceInfo> supplierInfos = new ArrayList<>();
         String[] orderIds = orderIdsStr.split(",");
         for (String orderIdStr : orderIds) {
             Long orderId = Long.parseLong(orderIdStr);
@@ -231,11 +232,24 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
             orderInfo.setHistoryStatus(Long.parseLong(OrderStatus.ORDER_STATUS_1.getValue()));
             orderInfos.add(orderInfo);
         }
-        Boolean execute = transactionTemplate.execute(result -> {
-            orderInfoMapper.updateById(orderInfos);
-            return userBalanceInfoService.updateBatchById(userBalanceInfos);
-        });
-        return StringUtils.isNotNull(execute) ? execute ? 1 : 0 : 0;
+
+        orderInfoMapper.updateById(orderInfos);
+        userBalanceInfoService.saveOrUpdateBatch(userBalanceInfos);
+        for (OrderInfo orderInfo : orderInfos) {
+            //为供应商充值
+            UserBalanceInfo supplierBalanceInfo = userBalanceInfoService.selectUserBalanceInfoByUserId(orderInfo.getSupplierId());
+            if (StringUtils.isNull(supplierBalanceInfo)) {
+                supplierBalanceInfo = new UserBalanceInfo();
+                supplierBalanceInfo.setUserId(orderInfo.getSupplierId());
+                supplierBalanceInfo.setBalance(orderInfo.getTotalPrice());
+                supplierBalanceInfo.setCreateTime(new Date());
+                supplierBalanceInfo.setUpdateTime(new Date());
+            } else {
+                supplierBalanceInfo.setBalance(supplierBalanceInfo.getBalance().add(orderInfo.getTotalPrice()));
+            }
+            supplierInfos.add(supplierBalanceInfo);
+        }
+        return userBalanceInfoService.saveOrUpdateBatch(supplierInfos) ? 1 : 0;
     }
 
 }

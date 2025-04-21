@@ -30,25 +30,25 @@
           end-placeholder="结束日期"
         ></el-date-picker>
       </el-form-item>
-      <el-form-item label="更新人" prop="updateBy">
-        <el-input
-          v-model="queryParams.updateBy"
-          placeholder="请输入更新人"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="更新时间">
-        <el-date-picker
-          v-model="daterangeUpdateTime"
-          style="width: 240px"
-          value-format="yyyy-MM-dd"
-          type="daterange"
-          range-separator="-"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-        ></el-date-picker>
-      </el-form-item>
+<!--      <el-form-item label="更新人" prop="updateBy">-->
+<!--        <el-input-->
+<!--          v-model="queryParams.updateBy"-->
+<!--          placeholder="请输入更新人"-->
+<!--          clearable-->
+<!--          @keyup.enter.native="handleQuery"-->
+<!--        />-->
+<!--      </el-form-item>-->
+<!--      <el-form-item label="更新时间">-->
+<!--        <el-date-picker-->
+<!--          v-model="daterangeUpdateTime"-->
+<!--          style="width: 240px"-->
+<!--          value-format="yyyy-MM-dd"-->
+<!--          type="daterange"-->
+<!--          range-separator="-"-->
+<!--          start-placeholder="开始日期"-->
+<!--          end-placeholder="结束日期"-->
+<!--        ></el-date-picker>-->
+<!--      </el-form-item>-->
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -158,14 +158,14 @@
       />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <!--          <el-button-->
-          <!--            size="mini"-->
-          <!--            type="text"-->
-          <!--            icon="el-icon-edit"-->
-          <!--            @click="handleUpdate(scope.row)"-->
-          <!--            v-hasPermi="['manage:orderInfo:edit']"-->
-          <!--          >修改-->
-          <!--          </el-button>-->
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-edit"
+            @click="handleUpdate(scope.row)"
+            v-hasPermi="['manage:orderInfo:edit']"
+          >修改
+          </el-button>
           <el-button
             size="mini"
             type="text"
@@ -189,24 +189,41 @@
     <!-- 添加或修改订单信息对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="商品" prop="goodsId">
-          <el-input v-model="form.goodsId" placeholder="请输入商品"/>
-        </el-form-item>
-        <el-form-item label="用户" prop="userId">
-          <el-input v-model="form.userId" placeholder="请输入用户"/>
-        </el-form-item>
+        <!--        <el-form-item label="商品" prop="goodsId">-->
+        <!--          <el-input v-model="form.goodsId" placeholder="请输入商品"/>-->
+        <!--        </el-form-item>-->
+        <!--        <el-form-item label="用户" prop="userId">-->
+        <!--          <el-input v-model="form.userId" placeholder="请输入用户"/>-->
+        <!--        </el-form-item>-->
         <el-form-item label="地址" prop="addressId">
-          <el-input v-model="form.addressId" placeholder="请输入地址"/>
+          <el-select
+            style="width: 100%"
+            v-model="form.addressId"
+            filterable
+            remote
+            reserve-keyword
+            placeholder="请输入手机号码"
+            :remote-method="selectUserAddressList"
+            :loading="userAddressLoading"
+          >
+            <el-option
+              v-for="item in userAddressList"
+              :key="item.addressId"
+              :label="`${item.phone}-${item.province}-${item.city}-${item.county}-${item.address}`"
+              :value="item.addressId"
+            >
+            </el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="价格" prop="totalPrice">
-          <el-input v-model="form.totalPrice" placeholder="请输入价格"/>
-        </el-form-item>
+        <!--        <el-form-item label="价格" prop="totalPrice">-->
+        <!--          <el-input v-model="form.totalPrice" placeholder="请输入价格"/>-->
+        <!--        </el-form-item>-->
         <el-form-item label="状态" prop="historyStatus">
-          <el-radio-group v-model="form.historyStatus">
+          <el-radio-group disabled v-model="form.historyStatus">
             <el-radio
               v-for="dict in dict.type.order_status"
               :key="dict.value"
-              :label="parseInt(dict.value)"
+              :label="dict.value"
             >{{ dict.label }}
             </el-radio>
           </el-radio-group>
@@ -249,12 +266,20 @@ import {
   updateOrderInfo,
   payOrderInfo
 } from '@/api/manage/orderInfo'
+import { listUserAddressInfo } from '@/api/manage/userAddressInfo'
 
 export default {
   name: 'OrderInfo',
   dicts: ['order_status'],
   data() {
     return {
+      userAddressList: [],
+      userAddressLoading: false,
+      userAddressQueryParams: {
+        userName: '',
+        pageNum: 1,
+        pageSize: 100
+      },
       openPay: false,
       //表格展示列
       columns: [
@@ -333,8 +358,42 @@ export default {
   },
   created() {
     this.getList()
+    this.getUserAddressList()
   },
   methods: {
+    /**
+     * 获取用户地址列表推荐
+     * @param query
+     */
+    selectUserAddressList(query) {
+      if (query !== '') {
+        this.userAddressLoading = true
+        this.userAddressQueryParams.phone = query
+        setTimeout(() => {
+          this.getUserAddressList()
+        }, 200)
+      } else {
+        this.userAddressList = []
+      }
+    },
+    /**
+     * 获取用户地址信息列表
+     */
+    getUserAddressList() {
+      //添加查询参数
+      if (this.form.userId != null) {
+        this.userAddressQueryParams.userId = this.form.userId
+      } else {
+        this.userAddressQueryParams.userId = null
+      }
+      if (this.userAddressQueryParams.userName != null) {
+        this.userAddressQueryParams.userId = null
+      }
+      listUserAddressInfo(this.userAddressQueryParams).then(res => {
+        this.userAddressList = res.rows
+        this.userAddressLoading = false
+      })
+    },
     submitFormPay() {
       console.log(this.form)
       payOrderInfo(this.ids).then(res => {
