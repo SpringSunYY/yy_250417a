@@ -60,6 +60,7 @@
       <el-card class="comment-card" v-for="comment in comments" :key="comment.id" shadow="never">
         <div class="comment-header">
           <el-rate :value="Number(comment.score)" disabled/>
+          <span class="comment-time">{{ comment.userName }}</span>
           <span class="comment-time">{{ comment.createTime }}</span>
         </div>
         <div class="comment-content">{{ comment.content }}</div>
